@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>World Cup Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background-color:#F5F0E6;
+  background-image:
+    repeating-linear-gradient(transparent,transparent 31px,rgba(110,75,40,.04) 32px),
+    radial-gradient(ellipse 80% 55% at 50% 20%,rgba(255,248,225,.38) 0%,transparent 65%),
+    radial-gradient(ellipse at center,transparent 52%,rgba(90,58,28,.06) 100%);
+  color:#1C1814;
+  overflow:hidden;
+  height:100dvh;width:100vw;
+  user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+#bg-wm{position:fixed;inset:0;pointer-events:none;z-index:0;display:flex;align-items:center;justify-content:center;font-size:52vmin;opacity:.016;overflow:hidden;color:#7A4228;line-height:1;}
+
+/* ── SCROLLING STRIP (top & bottom) ── */
+.wc-strip{
+  position:fixed;left:0;right:0;z-index:210;
+  height:26px;
+  background:#1E2D4A;
+  overflow:hidden;display:flex;align-items:center;
+}
+#top-strip{top:0;}
+#bot-strip{bottom:0;}
+.strip-track{
+  display:flex;align-items:center;
+  white-space:nowrap;
+  font-family:'Oswald',sans-serif;font-size:10px;font-weight:400;
+  letter-spacing:.7px;color:rgba(245,240,230,.52);
+  animation:tickerRun 48s linear infinite;
+}
+.strip-track .fi{padding:0 14px;}
+.strip-track .fs{color:rgba(184,146,26,.5);font-size:8px;}
+@keyframes tickerRun{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#bot-strip .strip-track{animation-direction:reverse;}
+
+/* ── HEADER ── */
+#header{
+  position:fixed;top:26px;left:0;right:0;z-index:200;
+  height:60px;
+  display:flex;align-items:center;
+  background:#FDFAF4;
+  border-top:3px solid #B8921A;
+  border-bottom:2px solid #1E2D4A;
+  padding:0 16px;
+  box-shadow:0 2px 10px rgba(30,20,8,.09);
+}
+#h-left{flex:0 0 auto;display:flex;align-items:center;}
+#h-logo{display:flex;align-items:center;gap:9px;}
+#h-trophy{display:flex;align-items:center;justify-content:center;width:34px;height:34px;flex-shrink:0;}
+#h-trophy img{height:34px;width:auto;object-fit:contain;display:none;filter:drop-shadow(0 2px 5px rgba(184,146,26,.4));}
+#h-trophy-emoji{font-size:22px;line-height:1;}
+#h-brand{display:flex;flex-direction:column;gap:1px;}
+#logo-txt{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;line-height:1;letter-spacing:.3px;color:#1C1814;text-transform:uppercase;}
+#logo-txt em{color:#B8921A;font-style:normal;}
+#logo-sub{font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:#6B5240;letter-spacing:.2px;line-height:1;}
+.hd{width:1px;height:30px;background:rgba(30,45,74,.14);margin:0 14px;flex-shrink:0;}
+#h-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0 6px;}
+#prog-txt{font-family:'Oswald',sans-serif;font-weight:600;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#3D2E22;}
+#h-pbar{width:min(170px,90%);height:5px;background:rgba(30,45,74,.1);border-radius:2px;overflow:hidden;border:1px solid rgba(30,45,74,.12);}
+#pfill{height:100%;width:0%;background:linear-gradient(90deg,#1B4332,#B8921A);transition:width .65s ease;border-radius:1px;}
+#h-right{flex:0 0 auto;display:flex;align-items:center;gap:8px;}
+.hstat{display:flex;flex-direction:column;align-items:center;gap:0px;}
+.hsl{font-family:'Oswald',sans-serif;font-size:7.5px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#8A7A6A;}
+.hsv{font-family:'Oswald',sans-serif;font-size:19px;font-weight:700;color:#1C1814;letter-spacing:0;line-height:1;}
+#combo-chip.hot .hsv{color:#B8921A;}
+#h-lives{display:flex;align-items:center;gap:2px;}
+.hrt{font-size:15px;color:#8C1515;display:inline-block;transition:opacity .25s,transform .25s;}
+.hrt.gone{opacity:.18;transform:scale(.65);filter:grayscale(1);}
+.hrt.pop{animation:hPop .5s ease;}
+.hrt.nope{animation:hNope .4s ease;}
+@keyframes hPop{0%,100%{transform:scale(1)}45%{transform:scale(1.55)}}
+@keyframes hNope{0%,100%{transform:translateX(0)scale(.65)}25%{transform:translateX(-4px)scale(.65)}75%{transform:translateX(4px)scale(.65)}}
+#lang-btn{
+  min-width:30px;height:30px;padding:0 6px;
+  background:rgba(30,45,74,.06);border:1px solid rgba(30,45,74,.15);
+  border-radius:4px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;transition:background .2s;
+  flex-shrink:0;white-space:nowrap;font-family:'Inter',sans-serif;
+}
+#lang-btn:hover{background:rgba(184,146,26,.1);border-color:rgba(184,146,26,.4);}
+#sound-btn{
+  width:30px;height:30px;
+  background:rgba(30,45,74,.06);border:1px solid rgba(30,45,74,.15);
+  border-radius:4px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;transition:background .2s;flex-shrink:0;
+}
+#sound-btn:hover{background:rgba(184,146,26,.1);}
+
+/* ── GAME LAYOUT ── */
+#game{position:fixed;top:86px;bottom:26px;left:0;right:0;display:flex;flex-direction:column;z-index:10;}
+
+/* ── TIMELINE AREA ── */
+#tl-area{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;}
+#tl-area::before,#tl-area::after{content:'';position:absolute;top:0;bottom:0;width:65px;z-index:5;pointer-events:none;}
+#tl-area::before{left:0;background:linear-gradient(to right,#F5F0E6,transparent);}
+#tl-area::after{right:0;background:linear-gradient(to left,#F5F0E6,transparent);}
+
+/* ── DEV QR WIDGET — bottom-right of timeline area ── */
+#dev-qr{
+  position:absolute;bottom:10px;right:10px;z-index:50;
+  width:64px;height:64px;
+  border-radius:8px;overflow:hidden;
+  border:2px solid rgba(30,45,74,.4);
+  box-shadow:0 3px 12px rgba(40,20,5,.28);
+  cursor:pointer;
+  transition:transform .2s ease,box-shadow .2s ease;
+  background:#fff;
+}
+#dev-qr img{width:100%;height:100%;object-fit:cover;display:block;}
+#dev-qr:hover{transform:scale(1.35);box-shadow:0 8px 22px rgba(40,20,5,.4);z-index:55;}
+@media(max-width:580px){ #dev-qr{width:46px;height:46px;bottom:6px;right:6px;} #dev-qr:hover{transform:scale(1.5);} }
+#tl-scroll{
+  position:absolute;inset:0;
+  overflow-x:auto;overflow-y:hidden;
+  display:flex;align-items:center;
+  scrollbar-width:none;-ms-overflow-style:none;
+  cursor:grab;
+  touch-action:pan-x pan-y;
+  -webkit-overflow-scrolling:touch;
+}
+#tl-scroll::-webkit-scrollbar{display:none;}
+#tl-scroll.panning{cursor:grabbing;}
+#tl-track{display:flex;align-items:center;flex-shrink:0;position:relative;padding:28px 0;min-height:230px;}
+#tl-track::before{
+  content:'';position:absolute;
+  top:50%;left:0;right:0;height:5px;
+  background:#1E2D4A;
+  box-shadow:0 2px 4px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.07);
+  transform:translateY(-50%);z-index:0;pointer-events:none;border-radius:1px;
+}
+
+/* ── DROP ZONES ── */
+.dz{
+  flex-shrink:0;width:12px;height:180px;
+  border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;cursor:pointer;
+  transition:width .22s cubic-bezier(.34,1.56,.64,1),background .16s,border .16s,box-shadow .16s;
+}
+.dz::before{content:'';position:absolute;width:1px;height:44%;background:rgba(30,45,74,.17);border-radius:1px;transition:opacity .2s;}
+.dz.open{width:66px;background:rgba(253,250,244,.9);border:1.5px dashed rgba(184,146,26,.5);}
+.dz.open::before{opacity:0;}
+.dz.hot{width:80px!important;background:rgba(248,242,224,.95)!important;border:2px solid rgba(184,146,26,.8)!important;box-shadow:0 0 0 4px rgba(212,175,55,.1),0 2px 8px rgba(30,20,5,.1);}
+.dz-lbl{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;color:#B8921A;opacity:0;transition:opacity .15s;}
+.dz.open .dz-lbl,.dz.hot .dz-lbl{opacity:1;}
+
+/* ── CARDS ── */
+.card{
+  flex-shrink:0;width:128px;height:178px;
+  background:#FDFAF4;
+  border:1px solid rgba(90,58,28,.19);
+  border-radius:4px;
+  box-shadow:0 2px 7px rgba(40,20,5,.13),0 1px 3px rgba(40,20,5,.07);
+  display:flex;flex-direction:column;
+  overflow:visible;position:relative;
+  cursor:default;z-index:3;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s;
+}
+.card:hover{transform:translateY(-9px) rotate(.5deg);box-shadow:0 14px 30px rgba(40,20,5,.2),0 4px 8px rgba(40,20,5,.1);}
+.card:hover .card-tip{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:none;}
+
+.cat-champion   {--cc:#8A6A08;--cbg:rgba(184,146,26,.1);}
+.cat-goal       {--cc:#1B5E38;--cbg:rgba(27,94,56,.1);}
+.cat-moment     {--cc:#1E3A6E;--cbg:rgba(30,58,110,.09);}
+.cat-controversy{--cc:#8C1515;--cbg:rgba(140,21,21,.09);}
+.cat-host       {--cc:#3D2A5E;--cbg:rgba(61,42,94,.09);}
+.cat-record     {--cc:#7A4228;--cbg:rgba(122,66,40,.1);}
+
+.card-photo{
+  width:100%;height:74px;flex-shrink:0;
+  position:relative;overflow:hidden;
+  background:var(--cbg,#EDE3C8);
+  display:flex;align-items:center;justify-content:center;
+  border-radius:3px 3px 0 0;
+}
+.card-photo img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center 20%;
+  z-index:1;display:none;
+  filter:sepia(.1) saturate(.95) brightness(.97);
+}
+.card-emoji{font-size:30px;z-index:0;line-height:1;position:relative;transition:opacity .3s;}
+.card-stripe{height:2px;flex-shrink:0;background:var(--cc,#7A4228);}
+.card-body{flex:1;padding:6px 10px 8px 10px;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
+.card-cat{font-family:'Oswald',sans-serif;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--cc,#7A4228);opacity:.85;}
+.card-ttl{font-family:'Playfair Display',serif;font-size:11.5px;font-weight:700;line-height:1.28;color:#1C1814;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.card-dsc{font-family:'Inter',sans-serif;font-size:9px;line-height:1.4;color:#5A4433;overflow:hidden;display:none;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.card-yr{
+  font-family:'Playfair Display',serif;font-size:19px;font-weight:800;
+  color:var(--cc,#7A4228);letter-spacing:.3px;
+  margin-top:auto;padding-top:4px;
+  border-top:1px solid rgba(90,58,28,.1);
+  transition:opacity .4s,filter .4s;line-height:1;
+}
+.card-yr.masked{opacity:0;filter:blur(7px);}
+.card-yr.shown{opacity:1;filter:none;}
+
+/* Tooltip */
+.card-tip{
+  position:absolute;bottom:calc(100% + 10px);left:50%;
+  transform:translateX(-50%) translateY(5px);
+  width:172px;
+  background:#FDFAF4;border:1px solid rgba(90,58,28,.22);
+  border-radius:3px;padding:10px 12px;
+  box-shadow:0 4px 18px rgba(40,20,5,.2);
+  opacity:0;transition:opacity .18s,transform .18s;
+  pointer-events:none;z-index:60;white-space:normal;
+}
+.card-tip::before{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:rgba(90,58,28,.22);border-bottom:none;z-index:-1;}
+.card-tip::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#FDFAF4;border-bottom:none;}
+.ct-cat{font-family:'Oswald',sans-serif;font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--cc,#7A4228);margin-bottom:4px;}
+.ct-ttl{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:#1C1814;margin-bottom:3px;line-height:1.28;}
+.ct-dsc{font-family:'Inter',sans-serif;font-size:10.5px;color:#5A4433;line-height:1.45;}
+
+/* Card snap-in animation (correct) */
+@keyframes cardSnap{
+  0%  {opacity:0;transform:translateY(-28px) scale(1.14) rotate(-4deg);}
+  55% {opacity:1;transform:translateY(4px) scale(.98) rotate(.4deg);}
+  75% {transform:translateY(-3px) scale(1.03);}
+  100%{transform:none;opacity:1;}
+}
+.card-in{animation:cardSnap .5s cubic-bezier(.34,1.56,.64,1) both;}
+
+/* Card wrong shake */
+@keyframes wrongShake{
+  0%,100%{transform:none;}
+  12%{transform:translateX(-14px) rotate(-3.5deg);}
+  26%{transform:translateX(14px) rotate(3.5deg);}
+  40%{transform:translateX(-10px) rotate(-2deg);}
+  56%{transform:translateX(10px) rotate(2deg);}
+  70%{transform:translateX(-5px) rotate(-1deg);}
+  84%{transform:translateX(5px);}
+}
+.shaking{animation:wrongShake .5s ease;}
+
+/* Wrong flash on card */
+@keyframes wrongRedFlash{
+  0%  {box-shadow:0 2px 7px rgba(40,20,5,.13);}
+  30% {box-shadow:0 0 0 3px rgba(140,21,21,.55),0 4px 12px rgba(140,21,21,.25);}
+  100%{box-shadow:0 2px 7px rgba(40,20,5,.13);}
+}
+.red-flash{animation:wrongRedFlash .65s ease;}
+
+/* ── STAGING CARD ── */
+#stage-wrap .card{width:150px;height:210px;cursor:grab;touch-action:none;}
+#stage-wrap .card:active{cursor:grabbing;}
+#stage-wrap .card-photo{height:88px;border-radius:3px 3px 0 0;}
+#stage-wrap .card-emoji{font-size:38px;}
+#stage-wrap .card-ttl{font-size:13px;-webkit-line-clamp:3;}
+#stage-wrap .card-dsc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+#stage-wrap .card-yr{font-size:22px;}
+/* tooltip enabled on staging card — overflow:visible on .card allows it to escape */
+#stage-wrap .card-tip{bottom:calc(100% + 10px);width:200px;}
+#stage-wrap .card:hover{transform:translateY(-5px) rotate(0);box-shadow:0 14px 34px rgba(40,20,5,.24);}
+
+/* Ghost */
+#ghost{position:fixed;z-index:9999;pointer-events:none;display:none;transform:rotate(-3deg) scale(1.06);filter:drop-shadow(0 12px 30px rgba(25,15,5,.52)) drop-shadow(0 3px 8px rgba(25,15,5,.25));}
+#ghost .card{width:132px;height:184px;}
+#ghost .card-photo{height:76px;}
+#ghost .card-emoji{font-size:30px;}
+#ghost .card-ttl{font-size:10.5px;}
+#ghost .card-yr{font-size:18px;}
+#ghost .card-tip{display:none;}
+
+/* ── STAGING AREA ── */
+#staging{
+  flex-shrink:0;height:212px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:9px;padding:12px 20px 10px;
+  background:#EDE7D5;
+  border-top:2px solid #1E2D4A;
+  position:relative;z-index:20;
+}
+#staging::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(27,67,50,.03) 0%,transparent 60%);}
+#stg-rule{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1.8px;text-transform:uppercase;color:#3D2E22;
+  position:relative;z-index:1;
+}
+.stg-orn{color:#B8921A;font-size:9px;}
+#stage-wrap{position:relative;cursor:grab;}
+#stage-wrap::before{content:'';position:absolute;inset:-6px;border-radius:6px;border:1.5px solid transparent;pointer-events:none;animation:stagePulse 3s ease-in-out infinite;}
+@keyframes stagePulse{0%,100%{border-color:transparent}50%{border-color:rgba(184,146,26,.22)}}
+#mob-btns{display:none;gap:9px;width:100%;max-width:300px;}
+.mb{flex:1;height:38px;border-radius:3px;cursor:pointer;font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;transition:background .15s,transform .12s;display:flex;align-items:center;justify-content:center;gap:4px;border:none;}
+.mb:active{transform:scale(.95);}
+.mb.bef{background:#E0D9C8;border:1.5px solid rgba(30,45,74,.25);color:#1E2D4A;}
+.mb.aft{background:#1E2D4A;color:#F5EED8;}
+
+/* ── FLASH / BURST / TOAST / SCORE POP ── */
+#flash{position:fixed;inset:0;z-index:100;pointer-events:none;opacity:0;}
+.fok{animation:fOk .55s ease-out forwards;background:radial-gradient(ellipse at 50% 44%,rgba(27,94,56,.16) 0%,transparent 65%);}
+.ferr{animation:fErr .7s ease-out forwards;background:radial-gradient(ellipse at 50% 44%,rgba(140,21,21,.16) 0%,transparent 65%);}
+@keyframes fOk{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+@keyframes fErr{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+
+#burst{position:fixed;inset:0;z-index:300;pointer-events:none;display:flex;align-items:center;justify-content:center;}
+#btext{font-family:'Playfair Display',serif;font-weight:900;font-style:italic;font-size:58px;letter-spacing:2px;opacity:0;text-transform:uppercase;will-change:transform,opacity;}
+.bok{color:#8A6A08;animation:bOk 1.2s cubic-bezier(.22,1,.36,1) forwards;text-shadow:0 4px 24px rgba(184,146,26,.45);}
+.ber{color:#8C1515;animation:bEr 1s cubic-bezier(.22,1,.36,1) forwards;text-shadow:0 4px 24px rgba(140,21,21,.45);}
+@keyframes bOk{
+  0%  {opacity:0;transform:scale(.3) translateY(22px) rotate(-3deg);}
+  13% {opacity:1;transform:scale(1.22) translateY(-7px) rotate(.8deg);}
+  30% {opacity:1;transform:scale(1) translateY(0);}
+  72% {opacity:1;}
+  100%{opacity:0;transform:scale(1.06) translateY(-32px);}
+}
+@keyframes bEr{
+  0%  {opacity:0;transform:scale(.3);}
+  13% {opacity:1;transform:scale(1.12) rotate(-2.5deg);}
+  28% {transform:scale(1) rotate(2.5deg);}
+  55% {opacity:1;}
+  100%{opacity:0;transform:scale(.88) translateY(-22px);}
+}
+
+/* Combo burst */
+@keyframes comboBurst{
+  0%  {opacity:0;transform:scale(.2) rotate(-8deg);}
+  15% {opacity:1;transform:scale(1.3) rotate(3deg);}
+  35% {transform:scale(.95) rotate(-1deg);}
+  75% {opacity:1;}
+  100%{opacity:0;transform:scale(1.08) translateY(-38px);}
+}
+.bcombo{animation:comboBurst 1.4s cubic-bezier(.22,1,.36,1) forwards;}
+
+.ptspop{position:fixed;pointer-events:none;z-index:400;font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:#8A6A08;letter-spacing:1px;animation:ptsFly 1.5s ease-out forwards;}
+@keyframes ptsFly{0%{opacity:1;transform:translateY(0) scale(1)}55%{opacity:1;transform:translateY(-52px) scale(1.12)}100%{opacity:0;transform:translateY(-95px) scale(.85)}}
+
+.cf{position:fixed;pointer-events:none;z-index:800;width:7px;height:7px;border-radius:1px;animation:cfFall var(--dur) ease-in forwards;}
+@keyframes cfFall{0%{opacity:1}100%{opacity:0;transform:var(--mv) rotate(540deg)}}
+
+#toast{
+  position:fixed;top:92px;left:50%;
+  transform:translateX(-50%) translateY(-10px);
+  background:#F9F0E6;border:1px solid rgba(140,21,21,.28);
+  border-radius:3px;padding:8px 18px;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#8C1515;
+  opacity:0;z-index:500;pointer-events:none;white-space:nowrap;
+  box-shadow:0 3px 12px rgba(40,20,5,.14);
+}
+#toast.show{animation:toastAnim 2.3s ease forwards;}
+@keyframes toastAnim{
+  0%  {opacity:0;transform:translateX(-50%) translateY(-10px);}
+  12% {opacity:1;transform:translateX(-50%) translateY(0);}
+  72% {opacity:1;}
+  100%{opacity:0;transform:translateX(-50%) translateY(-8px);}
+}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;background:rgba(14,18,28,.82);backdrop-filter:blur(5px) sepia(.14);opacity:0;pointer-events:none;transition:opacity .35s;}
+.screen.on{opacity:1;pointer-events:all;}
+.screen.on .panel{animation:panelIn .46s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes panelIn{from{transform:scale(.84) translateY(18px);opacity:0}to{transform:none;opacity:1}}
+.panel{
+  width:min(476px,92%);max-height:94dvh;overflow-y:auto;
+  background:#FDFAF4;
+  border:1px solid rgba(184,146,26,.22);
+  border-top:3px solid #B8921A;
+  border-radius:4px 4px 3px 3px;
+  padding:36px 32px;text-align:center;
+  box-shadow:0 16px 52px rgba(0,0,0,.26),0 4px 16px rgba(0,0,0,.1);
+  position:relative;
+}
+.panel::after{content:'';position:absolute;top:12px;left:18px;right:18px;height:1px;background:rgba(184,146,26,.12);pointer-events:none;}
+
+/* Start screen */
+.si{font-size:56px;display:block;margin-bottom:11px;animation:iconBob 3.5s ease-in-out infinite;filter:drop-shadow(0 3px 8px rgba(184,146,26,.3));}
+@keyframes iconBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.st{font-family:'Playfair Display',serif;font-weight:900;font-size:38px;letter-spacing:1px;line-height:.95;color:#1C1814;margin-bottom:7px;text-transform:uppercase;}
+.st em{color:#B8921A;font-style:normal;}
+.ss{font-family:'Inter',sans-serif;font-size:13.5px;color:#5A4433;line-height:1.6;margin-bottom:20px;}
+.lrow{display:flex;gap:7px;margin-bottom:18px;}
+.lopt{flex:1;height:38px;border-radius:3px;cursor:pointer;border:1px solid rgba(30,45,74,.16);background:rgba(30,45,74,.04);font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;color:#5A6070;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.lopt.sel{border-color:rgba(184,146,26,.45);background:rgba(184,146,26,.09);color:#8A6A08;}
+.lopt:hover:not(.sel){border-color:rgba(30,45,74,.28);color:#1E2D4A;}
+.steps{background:rgba(30,45,74,.03);border:1px solid rgba(30,45,74,.09);border-radius:3px;padding:14px 16px;margin-bottom:20px;text-align:left;display:flex;flex-direction:column;gap:11px;}
+.step{display:flex;align-items:flex-start;gap:10px;font-family:'Inter',sans-serif;font-size:13px;color:#3D2E22;line-height:1.5;}
+.sn{width:22px;height:22px;flex-shrink:0;background:#1E2D4A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:#F5EED8;}
+.btn-main{width:100%;height:50px;border:none;border-radius:3px;background:#1E2D4A;color:#F5EED8;font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(30,45,74,.3),3px 3px 0 rgba(0,0,0,.1);}
+.btn-main:hover{background:#263456;transform:translateY(-1px);box-shadow:0 5px 16px rgba(30,45,74,.35),3px 3px 0 rgba(0,0,0,.1);}
+.btn-main:active{transform:none;}
+
+/* Game over */
+.panel.go{border-top-color:#8C1515;}
+.gi{font-size:48px;display:block;margin-bottom:10px;}
+.gt{font-family:'Playfair Display',serif;font-weight:900;font-style:italic;font-size:34px;letter-spacing:1px;color:#1C1814;margin-bottom:4px;text-transform:uppercase;}
+.gsb{font-family:'Inter',sans-serif;font-size:13px;color:#5A4433;margin-bottom:16px;line-height:1.5;}
+.bbadge{background:rgba(27,94,56,.08);border:1px solid rgba(27,94,56,.25);border-radius:3px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#1B5E38;margin-bottom:12px;display:none;}
+.bbadge.on{display:block;}
+.abox{background:rgba(140,21,21,.05);border:1px solid rgba(140,21,21,.16);border-radius:3px;padding:11px 13px;font-family:'Inter',sans-serif;font-size:12.5px;color:#3D2E22;line-height:1.55;margin-bottom:14px;text-align:left;}
+.abox strong{color:#8C1515;font-weight:700;}
+.abox em{color:#1E2D4A;font-style:italic;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px;}
+.sc{background:rgba(30,45,74,.03);border:1px solid rgba(30,45,74,.09);border-radius:3px;padding:11px 10px;text-align:center;}
+.sc .sl{font-family:'Oswald',sans-serif;font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:#8A7A6A;margin-bottom:2px;}
+.sc .sv{font-family:'Playfair Display',serif;font-weight:800;font-size:26px;color:#1C1814;line-height:1;}
+.sc.big{grid-column:span 2;border-color:rgba(184,146,26,.18);background:rgba(184,146,26,.04);}
+.sc.big .sv{font-size:40px;color:#8A6A08;}
+.hsl-lbl{font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#8A7A6A;margin-bottom:6px;text-align:left;padding-bottom:4px;border-bottom:1px solid rgba(30,45,74,.09);}
+.hsr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:2px;margin-bottom:3px;}
+.hsr.cur{background:rgba(184,146,26,.07);border:1px solid rgba(184,146,26,.18);}
+.hsr:not(.cur){background:rgba(30,45,74,.03);border:1px solid rgba(30,45,74,.07);}
+.hr{font-family:'Oswald',sans-serif;color:#8A7A6A;font-weight:500;width:18px;font-size:10px;}
+.hp{font-family:'Playfair Display',serif;font-weight:800;font-size:18px;color:#8A6A08;}
+.hi{font-family:'Inter',sans-serif;color:#5A4433;font-size:11px;}
+.btn-rp{width:100%;height:46px;border:2px solid #1E2D4A;border-radius:3px;background:transparent;color:#1E2D4A;font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:12px;}
+.btn-rp:hover{background:#1E2D4A;color:#F5EED8;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){#h-pbar{width:120px;}.hd{margin:0 9px;}}
+@media(max-width:580px){
+  #top-strip,#bot-strip{height:22px;}
+  #header{top:22px;height:52px;padding:0 12px;border-top-width:2px;}
+  #logo-txt{font-size:13px;}#logo-sub{display:none;}
+  #h-pbar{display:none;}
+  #game{top:74px;bottom:22px;}
+  #staging{height:194px;padding:10px 14px 8px;}
+  #stage-wrap .card{width:136px;height:190px;}
+  #stage-wrap .card-photo{height:80px;}
+  #stage-wrap .card-emoji{font-size:34px;}
+  #stage-wrap .card-ttl{font-size:12px;}
+  #mob-btns{display:flex;}
+  .card{width:112px;height:155px;}
+  .card-photo{height:64px;}
+  .card-emoji{font-size:26px;}
+  .card-ttl{font-size:10.5px;}
+  .card-yr{font-size:16px;}
+  .st{font-size:32px;}
+  .panel{padding:26px 20px;}
+  #toast{top:80px;}
+  .hd.hdx{display:none;}
+}
+@media(max-width:380px){
+  .hsl,.hd:not(:last-of-type){display:none;}
+  #combo-chip{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="bg-wm" aria-hidden="true">🏆</div>
+<div id="flash"></div>
+<div id="burst"><span id="btext"></span></div>
+<div id="toast"></div>
+<div id="ghost"></div>
+
+<!-- ═══ TOP STRIP ═══ -->
+<div class="wc-strip" id="top-strip" aria-hidden="true">
+  <div class="strip-track" id="top-track"></div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header id="header">
+  <div id="h-left">
+    <div id="h-logo">
+      <div id="h-trophy">
+        <img id="trophy-img" alt="">
+        <span id="h-trophy-emoji">🏆</span>
+      </div>
+      <div id="h-brand">
+        <div id="logo-txt">WORLD CUP <em>TIMELINE</em></div>
+        <div id="logo-sub">Organize the History of the FIFA World Cup</div>
+      </div>
+    </div>
+  </div>
+  <div class="hd"></div>
+  <div id="h-center">
+    <div id="prog-txt">1 OF 103</div>
+    <div id="h-pbar"><div id="pfill"></div></div>
+  </div>
+  <div class="hd hdx"></div>
+  <div id="h-right">
+    <div class="hstat"><span class="hsl" id="cl-score">SCORE</span><span class="hsv" id="cv-score">0</span></div>
+    <div class="hd"></div>
+    <div class="hstat" id="combo-chip"><span class="hsl" id="cl-combo">COMBO</span><span class="hsv" id="cv-combo">×1</span></div>
+    <div class="hd"></div>
+    <div id="h-lives"><span class="hrt" id="h1">♥</span><span class="hrt" id="h2">♥</span><span class="hrt" id="h3">♥</span></div>
+    <div id="lang-btn">🇺🇸</div>
+    <div id="sound-btn" title="Music">🔇</div>
+  </div>
+</header>
+
+<!-- ═══ GAME ═══ -->
+<div id="game">
+  <div id="tl-area">
+    <div id="tl-scroll"><div id="tl-track"></div></div>
+    <a id="dev-qr" href="https://pixgg.com/Italows" target="_blank" rel="noopener" title="Ajude o Dev com as contas!">
+      <img src="data:image/jpeg;base64,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" alt="PIX QR Code - pixgg.com/Italows">
+    </a>
+  </div>
+  <div id="staging">
+    <div id="stg-rule"><span class="stg-orn">◆</span><span id="stg-lbl">Where in history does this event belong?</span><span class="stg-orn">◆</span></div>
+    <div id="stage-wrap"></div>
+    <div id="mob-btns">
+      <button class="mb bef" id="btn-bef">← BEFORE</button>
+      <button class="mb aft" id="btn-aft">AFTER →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOTTOM STRIP ═══ -->
+<div class="wc-strip" id="bot-strip" aria-hidden="true">
+  <div class="strip-track" id="bot-track"></div>
+</div>
+
+<!-- ═══ START SCREEN ═══ -->
+<div class="screen on" id="scr-start">
+  <div class="panel">
+    <span class="si">🏆</span>
+    <div class="st" id="s-ttl">WORLD CUP<br><em>TIMELINE</em></div>
+    <div class="ss" id="s-sub">Order the greatest moments in World Cup history — one event at a time.</div>
+    <div class="lrow">
+      <div class="lopt sel" id="lo-en" onclick="setLang('en')">🇺🇸 English</div>
+      <div class="lopt"     id="lo-pt" onclick="setLang('pt')">🇧🇷 Português</div>
+      <div class="lopt"     id="lo-es" onclick="setLang('es')">🇪🇸 Español</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><span id="st1">A World Cup event appears as a card with its year hidden.</span></div>
+      <div class="step"><div class="sn">2</div><span id="st2">Drag it into the correct spot on the timeline. Scroll to explore!</span></div>
+      <div class="step"><div class="sn">3</div><span id="st3">You have 3 lives. Each wrong placement costs one.</span></div>
+    </div>
+    <button class="btn-main" id="btn-start">KICK OFF</button>
+  </div>
+</div>
+
+<!-- ═══ GAME OVER SCREEN ═══ -->
+<div class="screen" id="scr-go">
+  <div class="panel go">
+    <span class="gi" id="go-icon">💔</span>
+    <div class="gt" id="go-ttl">Full Time</div>
+    <div class="gsb" id="go-sub">Better luck next time!</div>
+    <div class="bbadge" id="best-badge">🏆 New personal best!</div>
+    <div class="abox" id="abox" style="display:none"></div>
+    <div class="sgrid">
+      <div class="sc big"><div class="sl" id="sl-fs">Final Score</div><div class="sv" id="sv-score">0</div></div>
+      <div class="sc"><div class="sl" id="sl-cp">Cards Placed</div><div class="sv" id="sv-placed">0</div></div>
+      <div class="sc"><div class="sl" id="sl-bc">Best Combo</div><div class="sv" id="sv-combo">×0</div></div>
+      <div class="sc"><div class="sl" id="sl-ac">Accuracy</div><div class="sv" id="sv-acc">—</div></div>
+    </div>
+    <div class="hsl-lbl" id="hs-lbl">Top Scores</div>
+    <div id="hs-list"></div>
+    <button class="btn-rp" id="btn-rp">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   STRIP CONTENT (top & bottom)
+══════════════════════════════════════════════════ */
+const STRIP_HTML = `
+  <span class="fi">1930 · Uruguay</span><span class="fs">◆</span>
+  <span class="fi">1934 · Italy</span><span class="fs">◆</span>
+  <span class="fi">1938 · France</span><span class="fs">◆</span>
+  <span class="fi">1950 · Brazil</span><span class="fs">◆</span>
+  <span class="fi">1954 · Switzerland</span><span class="fs">◆</span>
+  <span class="fi">1958 · Sweden</span><span class="fs">◆</span>
+  <span class="fi">1962 · Chile</span><span class="fs">◆</span>
+  <span class="fi">1966 · England</span><span class="fs">◆</span>
+  <span class="fi">1970 · Mexico</span><span class="fs">◆</span>
+  <span class="fi">1974 · West Germany</span><span class="fs">◆</span>
+  <span class="fi">1978 · Argentina</span><span class="fs">◆</span>
+  <span class="fi">1982 · Spain</span><span class="fs">◆</span>
+  <span class="fi">1986 · Mexico</span><span class="fs">◆</span>
+  <span class="fi">1990 · Italy</span><span class="fs">◆</span>
+  <span class="fi">1994 · United States</span><span class="fs">◆</span>
+  <span class="fi">1998 · France</span><span class="fs">◆</span>
+  <span class="fi">2002 · Japan · South Korea</span><span class="fs">◆</span>
+  <span class="fi">2006 · Germany</span><span class="fs">◆</span>
+  <span class="fi">2010 · South Africa</span><span class="fs">◆</span>
+  <span class="fi">2014 · Brazil</span><span class="fs">◆</span>
+  <span class="fi">2018 · Russia</span><span class="fs">◆</span>
+  <span class="fi">2022 · Qatar</span><span class="fs">◆</span>
+  <span class="fi">2026 · USA · Canada · Mexico</span><span class="fs">◆</span>
+`.repeat(2);
+document.getElementById('top-track').innerHTML = STRIP_HTML;
+document.getElementById('bot-track').innerHTML = STRIP_HTML;
+
+/* ══════════════════════════════════════════════════
+   I18N  — EN / PT / ES
+══════════════════════════════════════════════════ */
+const L = {
+  en:{
+    logo:'WORLD CUP <em>TIMELINE</em>',ttl:'WORLD CUP<br><em>TIMELINE</em>',
+    sub:'Order the greatest moments in World Cup history — one event at a time.',
+    logoSub:'Organize the History of the FIFA World Cup',
+    st1:'A World Cup event appears as a card with its year hidden.',
+    st2:'Drag it into the correct spot on the timeline. Scroll to explore!',
+    st3:'You have 3 lives. Each wrong placement costs one.',
+    kick:'KICK OFF',slbl:'Where in history does this event belong?',
+    bef:'← BEFORE',aft:'AFTER →',combo:'COMBO',score:'SCORE',
+    slFs:'Final Score',slCp:'Cards Placed',slBc:'Best Combo',slAc:'Accuracy',
+    goTtl:'Full Time',newBest:'🏆 New personal best!',hsLbl:'Top Scores',replay:'PLAY AGAIN',
+    eventOf:(n,t)=>`${n} OF ${t}`,
+    correct:['Correct!','Brilliant!','Perfect!','Spot On!','Legendary!'],
+    wrong:['Wrong Year!','Not Quite!','So Close!'],
+    comboMsg:n=>`${n}× Combo!`,
+    lifeLost:n=>`Life lost — ${n} remaining`,lastLife:'Last life!',
+    subs:[[0,'Keep studying football history! 📚'],[3,'Not bad! ⚽'],[7,'Solid performance! 🌟'],[12,'Impressive knowledge! 🏅'],[20,'Hall of Fame material! 🏆'],[30,'GOAT-level! 🐐']],
+    won:'Incredible! You placed every event! 🐐',
+    ansPre:(t,y)=>`<strong>${t}</strong> happened in <strong>${y}</strong>.`,
+    ansBtw:(py,pt,ny,nt)=>` It belongs between <em>${py} — ${pt}</em> and <em>${ny} — ${nt}</em>.`,
+    ansAft:(py,pt)=>` It should come after <em>${py} — ${pt}</em>.`,
+    ansBef:(ny,nt)=>` It should come before <em>${ny} — ${nt}</em>.`,
+    cards:n=>`${n} card${n!==1?'s':''}`,
+  },
+  pt:{
+    logo:'COPA DO MUNDO <em>TIMELINE</em>',ttl:'COPA DO MUNDO<br><em>TIMELINE</em>',
+    sub:'Ordene os maiores momentos da história das Copas — uma carta de cada vez.',
+    logoSub:'A História da Copa do Mundo da FIFA',
+    st1:'Um evento da Copa aparece como uma carta com o ano oculto.',
+    st2:'Arraste para a posição correta na linha do tempo. Role para explorar!',
+    st3:'Você tem 3 vidas. Cada erro custa uma vida.',
+    kick:'COMEÇAR',slbl:'Em que momento da história este evento pertence?',
+    bef:'← ANTES',aft:'DEPOIS →',combo:'COMBO',score:'PONTOS',
+    slFs:'Pontuação Final',slCp:'Cartas Colocadas',slBc:'Melhor Combo',slAc:'Precisão',
+    goTtl:'Fim de Jogo',newBest:'🏆 Novo recorde pessoal!',hsLbl:'Melhores Pontuações',replay:'JOGAR NOVAMENTE',
+    eventOf:(n,t)=>`${n} DE ${t}`,
+    correct:['Correto!','Brilhante!','Perfeito!','Exato!','Lendário!'],
+    wrong:['Ano Errado!','Quase!','Tão Perto!'],
+    comboMsg:n=>`${n}× Combo!`,
+    lifeLost:n=>`Vida perdida — ${n} restante${n!==1?'s':''}`,lastLife:'Última vida!',
+    subs:[[0,'Estude mais a história do futebol! 📚'],[3,'Nada mau! ⚽'],[7,'Boa atuação! 🌟'],[12,'Impressionante! 🏅'],[20,'Material para o Hall da Fama! 🏆'],[30,'Nível GOAT! 🐐']],
+    won:'Incrível! Você posicionou todos os eventos! 🐐',
+    ansPre:(t,y)=>`<strong>${t}</strong> aconteceu em <strong>${y}</strong>.`,
+    ansBtw:(py,pt,ny,nt)=>` Pertence entre <em>${py} — ${pt}</em> e <em>${ny} — ${nt}</em>.`,
+    ansAft:(py,pt)=>` Deve vir após <em>${py} — ${pt}</em>.`,
+    ansBef:(ny,nt)=>` Deve vir antes de <em>${ny} — ${nt}</em>.`,
+    cards:n=>`${n} carta${n!==1?'s':''}`,
+  },
+  es:{
+    logo:'COPA DEL MUNDO <em>TIMELINE</em>',ttl:'COPA DEL MUNDO<br><em>TIMELINE</em>',
+    sub:'Ordena los grandes momentos de los Mundiales — una carta a la vez.',
+    logoSub:'La Historia de la Copa del Mundo de la FIFA',
+    st1:'Aparece un evento del Mundial como carta con el año oculto.',
+    st2:'Arrástrala a la posición correcta. ¡Desplázate para explorar!',
+    st3:'Tienes 3 vidas. Cada error te cuesta una vida.',
+    kick:'EMPEZAR',slbl:'¿En qué momento de la historia ocurrió este evento?',
+    bef:'← ANTES',aft:'DESPUÉS →',combo:'COMBO',score:'PUNTOS',
+    slFs:'Puntuación Final',slCp:'Cartas Colocadas',slBc:'Mejor Combo',slAc:'Precisión',
+    goTtl:'Tiempo Final',newBest:'🏆 ¡Nuevo récord personal!',hsLbl:'Mejores Puntuaciones',replay:'JUGAR DE NUEVO',
+    eventOf:(n,t)=>`${n} DE ${t}`,
+    correct:['¡Correcto!','¡Brillante!','¡Perfecto!','¡Exacto!','¡Legendario!'],
+    wrong:['¡Año Equivocado!','¡Casi!','¡Tan Cerca!'],
+    comboMsg:n=>`¡${n}× Combo!`,
+    lifeLost:n=>`Vida perdida — quedan ${n}`,lastLife:'¡Última vida!',
+    subs:[[0,'¡Sigue estudiando historia del fútbol! 📚'],[3,'¡No está mal! ⚽'],[7,'¡Buena actuación! 🌟'],[12,'¡Impresionante! 🏅'],[20,'¡Material para el Salón de la Fama! 🏆'],[30,'¡Nivel GOAT! 🐐']],
+    won:'¡Increíble! ¡Colocaste todos los eventos! 🐐',
+    ansPre:(t,y)=>`<strong>${t}</strong> ocurrió en <strong>${y}</strong>.`,
+    ansBtw:(py,pt,ny,nt)=>` Pertenece entre <em>${py} — ${pt}</em> y <em>${ny} — ${nt}</em>.`,
+    ansAft:(py,pt)=>` Debe ir después de <em>${py} — ${pt}</em>.`,
+    ansBef:(ny,nt)=>` Debe ir antes de <em>${ny} — ${nt}</em>.`,
+    cards:n=>`${n} carta${n!==1?'s':''}`,
+  }
+};
+let lang = localStorage.getItem('wct-lang') || 'en';
+const tr=(k,...a)=>{ const v=L[lang][k]; return typeof v==='function'?v(...a):v; };
+
+function setLang(l) {
+  lang=l; localStorage.setItem('wct-lang',l);
+  document.getElementById('lo-en').classList.toggle('sel',l==='en');
+  document.getElementById('lo-pt').classList.toggle('sel',l==='pt');
+  document.getElementById('lo-es').classList.toggle('sel',l==='es');
+  document.getElementById('lang-btn').textContent = l==='en'?'🇺🇸':l==='pt'?'🇧🇷':'🇪🇸';
+  applyI18n();
+  if(gameActive){
+    renderTimeline(false); applyPadding();
+    if(currentCard){ refreshStageCard(); }
+  }
+}
+function applyI18n(){
+  const l=L[lang];
+  document.getElementById('logo-txt').innerHTML    =l.logo;
+  document.getElementById('logo-sub').textContent  =l.logoSub;
+  document.getElementById('s-ttl').innerHTML       =l.ttl;
+  document.getElementById('s-sub').textContent     =l.sub;
+  document.getElementById('st1').textContent       =l.st1;
+  document.getElementById('st2').textContent       =l.st2;
+  document.getElementById('st3').textContent       =l.st3;
+  document.getElementById('btn-start').textContent =l.kick;
+  document.getElementById('stg-lbl').textContent   =l.slbl;
+  document.getElementById('btn-bef').textContent   =l.bef;
+  document.getElementById('btn-aft').textContent   =l.aft;
+  document.getElementById('cl-combo').textContent  =l.combo;
+  document.getElementById('cl-score').textContent  =l.score;
+  document.getElementById('sl-fs').textContent     =l.slFs;
+  document.getElementById('sl-cp').textContent     =l.slCp;
+  document.getElementById('sl-bc').textContent     =l.slBc;
+  document.getElementById('sl-ac').textContent     =l.slAc;
+  document.getElementById('go-ttl').textContent    =l.goTtl;
+  document.getElementById('best-badge').textContent=l.newBest;
+  document.getElementById('hs-lbl').textContent    =l.hsLbl;
+  document.getElementById('btn-rp').textContent    =l.replay;
+  if(gameActive) document.getElementById('prog-txt').textContent=tr('eventOf',timeline.length,EVENTS.length);
+}
+document.getElementById('lang-btn').onclick=()=>{
+  const order=['en','pt','es'];
+  setLang(order[(order.indexOf(lang)+1)%3]);
+};
+
+/* ══════════════════════════════════════════════════
+   IMAGES — Wikipedia API (async, progressively loads)
+══════════════════════════════════════════════════ */
+const IMGS={};
+const WIKI_ART={
+  11:'1930 FIFA World Cup',14:'Maracanazo',15:'Miracle of Bern',
+  16:'1958 FIFA World Cup',17:'Pelé',18:'Just Fontaine',
+  19:'1962 FIFA World Cup',22:'1966 FIFA World Cup',24:'1970 FIFA World Cup',
+  25:'Gordon Banks',26:'1970 FIFA World Cup semi-finals',27:'1974 FIFA World Cup',
+  30:'1978 FIFA World Cup',32:'1982 FIFA World Cup',36:'1986 FIFA World Cup',
+  37:'Hand of God goal',38:'Goal of the century',41:'1990 FIFA World Cup',
+  42:'Paul Gascoigne',44:'Salvatore Schillaci',45:'Roger Milla',
+  46:'1994 FIFA World Cup',47:'Roberto Baggio',50:'1998 FIFA World Cup',
+  52:'Dennis Bergkamp',55:'2002 FIFA World Cup',61:'2006 FIFA World Cup',
+  62:'Zinedine Zidane',63:'Miroslav Klose',65:'2010 FIFA World Cup',
+  66:'Andrés Iniesta',68:'Paul the Octopus',71:'2014 FIFA World Cup',
+  72:'Germany–Brazil (2014 FIFA World Cup)',74:'James Rodríguez',
+  78:'2018 FIFA World Cup',79:'Kylian Mbappé',81:'Luka Modrić',
+  87:'2022 FIFA World Cup',88:'Lionel Messi',100:'Roger Milla',101:'Roberto Baggio'
+};
+
+function updateCardImage(evId,url){
+  IMGS[evId]=url;
+  document.querySelectorAll(`[data-eid="${evId}"]`).forEach(card=>{
+    let img=card.querySelector('.card-photo img');
+    if(!img){ img=document.createElement('img'); img.loading='lazy'; img.alt=''; img.onerror=()=>img.style.display='none'; card.querySelector('.card-photo').prepend(img); }
+    img.src=url; img.style.display='block';
+    const em=card.querySelector('.card-emoji'); if(em) em.style.opacity='0';
+  });
+}
+
+async function loadImages(){
+  // Trophy image for header
+  fetch('https://en.wikipedia.org/w/api.php?action=query&titles=FIFA%20World%20Cup%20Trophy&prop=pageimages&pithumbsize=120&pilicense=any&format=json&origin=*')
+    .then(r=>r.json()).then(d=>{
+      const p=Object.values(d.query.pages)[0];
+      if(p?.thumbnail?.source){
+        const img=document.getElementById('trophy-img');
+        img.src=p.thumbnail.source; img.style.display='block';
+        document.getElementById('h-trophy-emoji').style.display='none';
+      }
+    }).catch(()=>{});
+
+  // Event images — batch of 8
+  const entries=Object.entries(WIKI_ART);
+  for(let i=0;i<entries.length;i+=8){
+    const batch=entries.slice(i,i+8);
+    try{
+      const titleArr=batch.map(([,t])=>t);
+      const lookup={};
+      batch.forEach(([id,t])=>{ lookup[t.toLowerCase()]=parseInt(id); });
+      const url=`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titleArr.join('|'))}&prop=pageimages&pithumbsize=400&pilicense=any&redirects=1&format=json&origin=*`;
+      const res=await fetch(url,{signal:AbortSignal.timeout?AbortSignal.timeout(8000):undefined});
+      const data=await res.json();
+      // Handle redirects/normalized
+      const norm={}; (data.query.normalized||[]).forEach(n=>{ norm[n.to.toLowerCase()]=n.from.toLowerCase(); });
+      const redir={}; (data.query.redirects||[]).forEach(r=>{ redir[r.to.toLowerCase()]=r.from.toLowerCase(); });
+      Object.values(data.query.pages||{}).forEach(page=>{
+        const thumb=page.thumbnail?.source; if(!thumb) return;
+        const pt=page.title.toLowerCase();
+        let evId=lookup[pt]||lookup[norm[pt]]||lookup[redir[pt]];
+        if(!evId){ for(const[t,id] of Object.entries(lookup)){ if(pt.includes(t)||t.includes(pt)){evId=id;break;} } }
+        if(evId) updateCardImage(evId,thumb);
+      });
+    }catch(e){}
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   EVENTS — 103 events with EN / PT / ES
+══════════════════════════════════════════════════ */
+const CCAT={champion:'#8A6A08',goal:'#1B5E38',moment:'#1E3A6E',controversy:'#8C1515',host:'#3D2A5E',record:'#7A4228'};
+const EVENTS=[
+  {id:1,  year:1930,cat:'host',       e:'🌍',title:{en:'First World Cup — Uruguay',               pt:'Primeira Copa — Uruguai',               es:'Primera Copa del Mundo — Uruguay'},            hint:{en:'13 nations in Montevideo for the inaugural tournament.',              pt:'13 nações em Montevidéu para o torneio inaugural.',              es:'13 naciones en Montevideo para el torneo inaugural.'}},
+  {id:2,  year:1934,cat:'host',       e:'🇮🇹',title:{en:'Italy Hosts the World Cup',               pt:'Itália Sedeia a Copa',                  es:'Italia Sede del Mundial'},                     hint:{en:'Mussolini used the tournament for political prestige.',              pt:'Mussolini usou o torneio como prestígio político.',               es:'Mussolini utilizó el torneo como prestigio político.'}},
+  {id:3,  year:1938,cat:'host',       e:'🇫🇷',title:{en:'France Hosts — Last Pre-War Cup',          pt:'França Sedeia — Última Copa Pré-Guerra', es:'Francia Sede — Última Copa Previa a la Guerra'}, hint:{en:'War would cancel the next two editions.',                          pt:'A guerra cancelaria as próximas duas edições.',                   es:'La guerra cancelaría las dos próximas ediciones.'}},
+  {id:4,  year:1950,cat:'host',       e:'🇧🇷',title:{en:'Brazil Hosts — The Maracanã Era',          pt:'Brasil Sedeia — A Era do Maracanã',      es:'Brasil Sede — La Era del Maracaná'},           hint:{en:'The Maracanã was built for 200,000 spectators.',                   pt:'O Maracanã foi construído para 200.000 espectadores.',            es:'El Maracaná fue construido para 200.000 espectadores.'}},
+  {id:5,  year:1966,cat:'controversy',e:'🐕',title:{en:'Jules Rimet Trophy Stolen',                 pt:'Taça Jules Rimet Roubada',               es:'La Copa Jules Rimet Robada'},                  hint:{en:'Found by Pickles the dog before the tournament.',                  pt:'Encontrada pelo cachorro Pickles antes do torneio.',              es:'Encontrada por el perro Pickles antes del torneo.'}},
+  {id:6,  year:1994,cat:'host',       e:'🇺🇸',title:{en:'USA Hosts — Record Crowds',                pt:'EUA Sedeia — Públicos Recordes',         es:'EE.UU. Sede — Récord de Asistencia'},          hint:{en:'Football arrives in North America with record attendance.',         pt:'O futebol chega à América do Norte com público recorde.',         es:'El fútbol llega a América del Norte con récord de asistencia.'}},
+  {id:7,  year:1998,cat:'host',       e:'🌐',title:{en:'32-Team Format Debuts',                     pt:'Formato de 32 Seleções Estreia',         es:'Debut del Formato de 32 Equipos'},            hint:{en:'France hosts an expanded edition with 32 nations.',               pt:'A França recebe a edição expandida com 32 seleções.',             es:'Francia acoge una edición ampliada con 32 naciones.'}},
+  {id:8,  year:2002,cat:'host',       e:'🌏',title:{en:'First Asian World Cup',                     pt:'Primeira Copa na Ásia',                  es:'Primera Copa del Mundo en Asia'},              hint:{en:'Japan and South Korea co-host for the first time.',               pt:'Japão e Coreia do Sul sediam juntos pela primeira vez.',          es:'Japón y Corea del Sur son anfitriones conjuntos por primera vez.'}},
+  {id:9,  year:2010,cat:'host',       e:'🌍',title:{en:'First African World Cup',                   pt:'Primeira Copa na África',                es:'Primera Copa del Mundo en África'},            hint:{en:'South Africa becomes the first African host nation.',              pt:'África do Sul torna-se o primeiro país africano anfitrião.',      es:'Sudáfrica se convierte en la primera nación anfitriona africana.'}},
+  {id:10, year:2022,cat:'host',       e:'🏜️',title:{en:'First Middle East World Cup',               pt:'Primeira Copa no Oriente Médio',         es:'Primera Copa del Mundo en Oriente Medio'},    hint:{en:'Qatar becomes the first Middle Eastern host nation.',              pt:'Qatar torna-se o primeiro anfitrião do Oriente Médio.',          es:'Catar se convierte en el primer anfitrión de Oriente Medio.'}},
+  {id:11, year:1930,cat:'champion',   e:'🏆',title:{en:'Uruguay: First World Champions',             pt:'Uruguai: Primeiros Campeões',            es:'Uruguay: Primeros Campeones del Mundo'},       hint:{en:'The host nation wins the inaugural World Cup trophy.',             pt:'A nação anfitriã vence a troféu inaugural.',                      es:'La nación anfitriona gana el primer trofeo del Mundial.'}},
+  {id:12, year:1934,cat:'champion',   e:'🏆',title:{en:"Italy's First World Cup Title",             pt:'Primeiro Título Mundial da Itália',       es:'Primer Título Mundial de Italia'},             hint:{en:'Italy win on home soil under Vittorio Pozzo.',                    pt:'A Itália vence em casa sob Vittorio Pozzo.',                      es:'Italia gana en casa bajo la dirección de Vittorio Pozzo.'}},
+  {id:13, year:1938,cat:'champion',   e:'🏆',title:{en:'Italy: Back-to-Back Champions',              pt:'Itália: Bicampeã Consecutiva',           es:'Italia: Campeona Consecutiva'},               hint:{en:'First ever back-to-back World Cup champions in history.',          pt:'Os primeiros bicampeões consecutivos da história.',               es:'Los primeros campeones consecutivos de la historia.'}},
+  {id:14, year:1950,cat:'moment',     e:'😱',title:{en:'Maracanazo — Shock of the Century',          pt:'Maracanazo — Choque do Século',          es:'El Maracanazo — El Shock del Siglo'},          hint:{en:'Uruguay silences 200,000 Brazilians in the deciding match.',      pt:'Uruguai silencia 200.000 brasileiros no jogo decisivo.',          es:'Uruguay silencia a 200.000 brasileños en el partido decisivo.'}},
+  {id:15, year:1954,cat:'champion',   e:'⚡',title:{en:'Miracle of Bern',                           pt:'Milagre de Berna',                       es:'El Milagro de Berna'},                         hint:{en:"West Germany defeats Hungary 3-2 after Hungary's 4-year unbeaten run.",pt:'Alemanha Ocidental vence a Hungria 3-2, encerrando 4 anos de invencibilidade.',es:'Alemania Occ. derrota a Hungría 3-2, rompiendo su invicto de 4 años.'}},
+  {id:16, year:1958,cat:'champion',   e:'⭐',title:{en:"Brazil's First World Title",                 pt:'Primeiro Título Mundial do Brasil',       es:'Primer Título Mundial de Brasil'},             hint:{en:'17-year-old Pelé scores twice in the final in Sweden.',           pt:'Pelé, de 17 anos, marca duas vezes na final na Suécia.',          es:'Pelé, de 17 años, marca dos veces en la final en Suecia.'}},
+  {id:17, year:1958,cat:'goal',       e:'⚽',title:{en:"Pelé's World Cup Debut Goal",                pt:'Gol de Estreia de Pelé na Copa',         es:'El Debut Goleador de Pelé'},                   hint:{en:'At 17, the youngest scorer in World Cup history at the time.',     pt:'Com 17 anos, o mais jovem artilheiro da história da Copa na época.',es:'Con 17 años, el goleador más joven de la historia del Mundial.'}},
+  {id:18, year:1958,cat:'record',     e:'🎯',title:{en:"Just Fontaine's 13 Goals",                  pt:'13 Gols de Just Fontaine',               es:'Los 13 Goles de Just Fontaine'},               hint:{en:"France's Fontaine scores 13 goals — an unbeaten single-tournament record.",pt:'O francês Fontaine marca 13 gols — recorde imbatível em um torneio.',es:'El francés Fontaine marca 13 goles — récord aún vigente en un torneo.'}},
+  {id:19, year:1962,cat:'champion',   e:'🏆',title:{en:'Brazil Bicampeão',                          pt:'Brasil Bicampeão',                       es:'Brasil Bicampeón'},                            hint:{en:"Garrincha carries Brazil to glory with Pelé injured.",             pt:'Garrincha carrega o Brasil com Pelé lesionado.',                  es:'Garrincha lleva a Brasil a la gloria con Pelé lesionado.'}},
+  {id:20, year:1962,cat:'controversy',e:'🥊',title:{en:'The Battle of Santiago',                    pt:'A Batalha de Santiago',                  es:'La Batalla de Santiago'},                      hint:{en:'Chile vs Italy — considered the most violent World Cup game ever.',pt:'Chile vs Itália — considerado o jogo mais violento da Copa.',     es:'Chile vs Italia — considerado el partido más violento del Mundial.'}},
+  {id:21, year:1962,cat:'record',     e:'🦅',title:{en:'Garrincha Named Player of Tournament',      pt:'Garrincha Eleito Melhor do Torneio',     es:'Garrincha, Mejor del Torneo'},                hint:{en:"Named player of the tournament despite Pelé's absence.",           pt:'Eleito o melhor do torneio apesar da ausência de Pelé.',          es:'Elegido mejor del torneo pese a la ausencia de Pelé.'}},
+  {id:22, year:1966,cat:'champion',   e:'🦁',title:{en:"England's Only World Cup",                  pt:'Único Título da Copa da Inglaterra',     es:'El Único Mundial de Inglaterra'},              hint:{en:"Geoff Hurst's hat-trick seals it at Wembley.",                    pt:'O hat-trick de Geoff Hurst sela a vitória em Wembley.',           es:'El hat-trick de Geoff Hurst sella la victoria en Wembley.'}},
+  {id:23, year:1966,cat:'moment',     e:'🇰🇵',title:{en:'North Korea Shocks Italy',                 pt:'Coreia do Norte Choca a Itália',         es:'Corea del Norte Sorprende a Italia'},          hint:{en:'North Korea defeat Italy 1-0 in one of the great World Cup upsets.',pt:'Coreia do Norte derrota a Itália 1-0 em uma das grandes surpresas.',es:'Corea del Norte derrota a Italia 1-0 en una de las grandes sorpresas.'}},
+  {id:24, year:1970,cat:'champion',   e:'👑',title:{en:'Brazil Tricampeão — The Golden Team',       pt:'Brasil Tricampeão — O Escrete de Ouro',  es:'Brasil Tricampeón — El Equipo Dorado'},        hint:{en:"Pelé's last World Cup. Widely considered the greatest team ever.",  pt:'Última Copa de Pelé. Considerada a maior equipe de todos os tempos.',es:'Último Mundial de Pelé. Considerado el mejor equipo de la historia.'}},
+  {id:25, year:1970,cat:'moment',     e:'🧤',title:{en:"Gordon Banks' Save vs Pelé",                pt:'Defesa de Gordon Banks vs Pelé',         es:'La Parada de Gordon Banks vs Pelé'},           hint:{en:"Pelé called it the greatest save he ever witnessed.",              pt:'Pelé disse ser a maior defesa que já testemunhou.',               es:'Pelé la llamó la mejor parada que jamás presenció.'}},
+  {id:26, year:1970,cat:'moment',     e:'🎭',title:{en:'West Germany vs Italy — Game of the Century',pt:'Alemanha vs Itália — Jogo do Século',  es:'Alemania vs Italia — El Partido del Siglo'},  hint:{en:'4-3 semi-final with five goals in extra time. FIFA called it the Match of the Century.',pt:'Semifinal 4-3 com cinco gols na prorrogação. FIFA chamou de Jogo do Século.',es:'Semifinal 4-3 con cinco goles en prórroga. La FIFA lo llamó el Partido del Siglo.'}},
+  {id:27, year:1974,cat:'champion',   e:'🇩🇪',title:{en:'West Germany Defeats Total Football',      pt:'Alemanha Ocidental Derrota o Futebol Total',es:'Alemania Occ. Vence al Fútbol Total'},      hint:{en:'West Germany defeats the brilliant Dutch 2-1 in Munich.',         pt:'Alemanha Ocidental derrota os brilhantes holandeses 2-1 em Munique.',es:'Alemania Occidental derrota a los brillantes neerlandeses 2-1 en Múnich.'}},
+  {id:28, year:1974,cat:'moment',     e:'🟠',title:{en:"Netherlands' Clockwork Orange",             pt:'A Laranja Mecânica Holandesa',           es:'La Naranja Mecánica Holandesa'},               hint:{en:"Johan Cruyff's Total Football reaches the final but loses.",        pt:'O Futebol Total de Johan Cruyff chega à final mas perde.',        es:'El Fútbol Total de Johan Cruyff llega a la final pero pierde.'}},
+  {id:29, year:1974,cat:'goal',       e:'💫',title:{en:'The Cruyff Turn vs Sweden',                 pt:'O Cruyff Turn vs Suécia',                es:'El Cruyff Turn vs Suecia'},                    hint:{en:'Cruyff invents his iconic feint live in a World Cup group match.',  pt:'Cruyff inventa o seu icônico drible ao vivo num jogo de grupo.',  es:'Cruyff inventa su célebre regate en vivo en un partido del grupo.'}},
+  {id:30, year:1978,cat:'champion',   e:'🇦🇷',title:{en:"Argentina's First World Cup Title",        pt:'Primeiro Título Mundial da Argentina',   es:'El Primer Título Mundial de Argentina'},       hint:{en:'Mario Kempes fires Argentina to victory on home soil.',            pt:'Mario Kempes leva a Argentina à vitória em casa.',                es:'Mario Kempes lleva a Argentina a la victoria en casa.'}},
+  {id:31, year:1978,cat:'controversy',e:'❓',title:{en:"Argentina's Controversial 6-0 vs Peru",    pt:"Controverso 6-0 da Argentina vs Peru",   es:'El Polémico 6-0 de Argentina vs Perú'},       hint:{en:'Argentina needed 4 goals. They won 6-0 amid match-fixing allegations.',pt:'Argentina precisava de 4 gols. Venceu 6-0 com alegações de fraude.',es:'Argentina necesitaba 4 goles. Ganó 6-0 con denuncias de amaño.'}},
+  {id:32, year:1982,cat:'champion',   e:'🏆',title:{en:'Italy Wins a Third World Cup',              pt:'Itália Vence o Terceiro Mundial',        es:'Italia Gana su Tercer Mundial'},               hint:{en:"Paolo Rossi's hat-trick vs Brazil ignites Italy's title run.",     pt:'Hat-trick de Rossi vs Brasil inicia a corrida italiana ao título.', es:'El hat-trick de Rossi vs Brasil inicia la carrera de Italia al título.'}},
+  {id:33, year:1982,cat:'moment',     e:'🔥',title:{en:'Brazil vs Italy — The Epic Duel',          pt:'Brasil vs Itália — O Duelo Épico',       es:'Brasil vs Italia — El Duelo Épico'},           hint:{en:"Rossi's hat-trick ends arguably the greatest team never to win.",   pt:'Hat-trick de Rossi elimina talvez a maior equipe que nunca venceu.',es:'El hat-trick de Rossi elimina quizás al mejor equipo que nunca ganó.'}},
+  {id:34, year:1982,cat:'record',     e:'🥇',title:{en:"Paolo Rossi — Golden Boot",                pt:'Paolo Rossi — Chuteira de Ouro',         es:'Paolo Rossi — Bota de Oro'},                   hint:{en:'Returns from a 2-year ban to score 6 goals and win the Golden Boot.',pt:'Retorna de suspensão de 2 anos para marcar 6 gols e vencer a Chuteira de Ouro.',es:'Regresa de una suspensión de 2 años para marcar 6 goles y ganar la Bota de Oro.'}},
+  {id:35, year:1982,cat:'moment',     e:'🍀',title:{en:'Northern Ireland Beat Spain',              pt:'Irlanda do Norte Vence Espanha',         es:'Irlanda del Norte Vence a España'},            hint:{en:'Gerry Armstrong scores as Northern Ireland beat the host nation.',  pt:'Gerry Armstrong marca enquanto a Irlanda do Norte vence os anfitriões.',es:'Gerry Armstrong marca cuando Irlanda del Norte vence a los anfitriones.'}},
+  {id:36, year:1986,cat:'champion',   e:'🏆',title:{en:'Argentina Bicampeão',                      pt:'Argentina Bicampeã',                     es:'Argentina Bicampeón'},                         hint:{en:'Maradona inspires Argentina to glory in Mexico City.',              pt:'Maradona inspira a Argentina à glória na Cidade do México.',       es:'Maradona inspira a Argentina a la gloria en Ciudad de México.'}},
+  {id:37, year:1986,cat:'controversy',e:'🖐️',title:{en:'Maradona — Hand of God',                  pt:'Maradona — Mão de Deus',                 es:'Maradona — La Mano de Dios'},                  hint:{en:"Maradona punches the ball in vs England, calling it 'the hand of God'.",pt:"Maradona soca a bola na rede vs Inglaterra, chamando de 'mão de Deus'.",es:"Maradona golpea el balón contra Inglaterra y lo llama 'la mano de Dios'."}},
+  {id:38, year:1986,cat:'goal',       e:'🌟',title:{en:'Goal of the Century',                       pt:'Gol do Século',                          es:'El Gol del Siglo'},                            hint:{en:'Maradona dribbles past five England players and the goalkeeper.',   pt:'Maradona dribla cinco jogadores ingleses e o goleiro para marcar.',es:'Maradona regatea a cinco jugadores ingleses y al portero para marcar.'}},
+  {id:39, year:1986,cat:'record',     e:'🥾',title:{en:"Lineker's Golden Boot",                    pt:'Chuteira de Ouro de Lineker',            es:'La Bota de Oro de Lineker'},                   hint:{en:'Gary Lineker scores 6 goals to win the Golden Boot.',              pt:'Gary Lineker marca 6 gols para vencer a Chuteira de Ouro.',       es:'Gary Lineker marca 6 goles para ganar la Bota de Oro.'}},
+  {id:40, year:1986,cat:'moment',     e:'🎭',title:{en:'France vs Brazil — Classic Shootout',      pt:'França vs Brasil — Clássico nos Pênaltis',es:'Francia vs Brasil — Penaltis Clásicos'},      hint:{en:'A classic quarter-final ends on penalties. The philosophical Platini vs Sócrates.',pt:'Uma clássica quartas termina nos pênaltis. O filosófico Platini vs Sócrates.',es:'Un clásico de cuartos se decide en penaltis. El filosófico Platini vs Sócrates.'}},
+  {id:41, year:1990,cat:'champion',   e:'🇩🇪',title:{en:"West Germany's Third Title",              pt:'Terceiro Título da Alemanha Ocidental',  es:'El Tercer Título de Alemania Occidental'},     hint:{en:'A penalty decides a dull final against Argentina.',                pt:'Um pênalti decide uma final sem brilho contra a Argentina.',       es:'Un penalti decide una sosa final contra Argentina.'}},
+  {id:42, year:1990,cat:'moment',     e:'😢',title:{en:"Gazza's Tears",                             pt:'Lágrimas de Gazza',                      es:'Las Lágrimas de Gazza'},                       hint:{en:"Gascoigne breaks down after a yellow card that would have kept him out of the final.",pt:'Gascoigne chora após cartão amarelo que o teria excluído da final.',es:'Gascoigne llora tras una tarjeta que le habría vetado la final.'}},
+  {id:43, year:1990,cat:'moment',     e:'😰',title:{en:'Penalty Shootouts Become Normal',          pt:'Pênaltis Tornam-se Comuns',              es:'Los Penaltis Se Normalizan'},                  hint:{en:'West Germany beats Argentina on penalties in a broadly criticised final.',pt:'Alemanha Ocidental vence nos pênaltis numa final amplamente criticada.',es:'Alemania Occ. vence a Argentina en penaltis en una final muy criticada.'}},
+  {id:44, year:1990,cat:'record',     e:'⭐',title:{en:'Schillaci — Golden Boot & Ball',            pt:'Schillaci — Chuteira e Bola de Ouro',    es:'Schillaci — Bota y Balón de Oro'},             hint:{en:"Toto Schillaci comes from nowhere to win both top individual awards.",pt:'Toto Schillaci vem do nada para vencer os dois prêmios individuais.',es:'Toto Schillaci surge de la nada para ganar los dos premios individuales.'}},
+  {id:45, year:1990,cat:'moment',     e:'🌍',title:{en:"Cameroon's Quarter-Final Run",             pt:"Quartas de Final de Camarões",           es:'El Cuarto de Final de Camerún'},               hint:{en:"Roger Milla's Cameroon become the first African team in the World Cup quarters.",pt:"Camarões de Roger Milla torna-se a primeira equipe africana nas quartas.",es:'El Camerún de Roger Milla se convierte en el primer equipo africano en cuartos.'}},
+  {id:46, year:1994,cat:'champion',   e:'🏆',title:{en:'Brazil Tetracampeão',                      pt:'Brasil Tetracampeão',                    es:'Brasil Tetracampeón'},                         hint:{en:"Romário wins the Golden Ball as Brazil triumph on penalties.",      pt:'Romário vence a Bola de Ouro enquanto o Brasil triunfa nos pênaltis.',es:'Romário gana el Balón de Oro mientras Brasil triunfa en penaltis.'}},
+  {id:47, year:1994,cat:'controversy',e:'💔',title:{en:'Baggio Misses the Decisive Penalty',       pt:'Baggio Erra o Pênalti Decisivo',         es:'Baggio Falla el Penalti Decisivo'},            hint:{en:"Roberto Baggio's penalty blazes over — Brazil win their fourth title.",pt:'O pênalti de Roberto Baggio passa por cima — Brasil vence o quarto título.',es:'El penalti de Baggio se va fuera — Brasil gana su cuarto título.'}},
+  {id:48, year:1994,cat:'controversy',e:'🚫',title:{en:'Maradona Drug Suspension',                  pt:'Suspensão por Doping de Maradona',       es:'Suspensión de Maradona por Dopaje'},           hint:{en:'Maradona is expelled after testing positive for ephedrine.',        pt:'Maradona é expulso após testar positivo para efedrina.',          es:'Maradona es expulsado tras dar positivo por efedrina.'}},
+  {id:49, year:1994,cat:'moment',     e:'🍀',title:{en:'Ireland Beat Italy in Groups',              pt:'Irlanda Vence Itália nos Grupos',        es:'Irlanda Vence a Italia en Grupos'},            hint:{en:"Ray Houghton's brilliant lob stuns the world.",                    pt:'O incrível lob de Ray Houghton surpreende o mundo.',              es:'El brillante lanzamiento de Ray Houghton asombra al mundo.'}},
+  {id:50, year:1998,cat:'champion',   e:'🇫🇷',title:{en:"France Wins Its First World Cup",         pt:'França Vence Seu Primeiro Mundial',      es:'Francia Gana su Primer Mundial'},              hint:{en:"Zidane heads in twice as Les Bleus win 3-0 in Paris.",             pt:'Zidane cabeceia duas vezes enquanto os Bleus vencem 3-0 em Paris.', es:'Zidane cabecea dos veces mientras Les Bleus ganan 3-0 en París.'}},
+  {id:51, year:1998,cat:'controversy',e:'❓',title:{en:"Ronaldo's Mysterious Collapse",             pt:'Colapso Misterioso de Ronaldo',          es:'El Misterioso Colapso de Ronaldo'},            hint:{en:"Brazil's star suffers a seizure before the final. He plays but is a shadow.",pt:'A estrela sofre convulsão antes da final. Joga mas é uma sombra.',es:'La estrella sufre un colapso antes de la final. Juega pero es su sombra.'}},
+  {id:52, year:1998,cat:'goal',       e:'⚽',title:{en:"Bergkamp's Goal vs Argentina",              pt:'Gol de Bergkamp vs Argentina',           es:'El Gol de Bergkamp vs Argentina'},             hint:{en:'Three touches, one second of brilliance — voted best goal of the tournament.',pt:'Três toques, um segundo de brilhantismo — votado melhor gol do torneio.',es:'Tres toques, un segundo de brillantez — elegido mejor gol del torneo.'}},
+  {id:53, year:1998,cat:'controversy',e:'🟥',title:{en:'Beckham Red Card vs Argentina',             pt:'Cartão Vermelho de Beckham vs Argentina',es:'Tarjeta Roja de Beckham vs Argentina'},        hint:{en:"Beckham flicks his boot at Simeone. England's Cup hopes die.",      pt:"Beckham chuta Simeone. As esperanças da Inglaterra morrem.",       es:'Beckham da una patada a Simeone. Las esperanzas de Inglaterra mueren.'}},
+  {id:54, year:1998,cat:'goal',       e:'⚡',title:{en:"Michael Owen vs Argentina",                 pt:'Michael Owen vs Argentina',              es:'Michael Owen vs Argentina'},                   hint:{en:'The 18-year-old storms past the Argentine defence and fires home.', pt:'O jovem de 18 anos passa pela defesa argentina e marca.',          es:'El joven de 18 años supera a la defensa argentina y dispara.'}},
+  {id:55, year:2002,cat:'champion',   e:'🏆',title:{en:'Brazil Pentacampeão',                      pt:'Brasil Pentacampeão',                    es:'Brasil Pentacampeón'},                         hint:{en:'Ronaldo scores twice in the final to seal a remarkable personal redemption.',pt:'Ronaldo marca duas vezes na final para selar uma notável redenção pessoal.',es:'Ronaldo marca dos veces en la final para sellar su notable redención.'}},
+  {id:56, year:2002,cat:'controversy',e:'🔥',title:{en:'Senegal Shocks France',                    pt:'Senegal Choca a França',                 es:'Senegal Sorprende a Francia'},                 hint:{en:"The defending champions are knocked out by their former colony.",   pt:'Os campeões defensores são eliminados pela ex-colônia.',          es:'Los campeones defensores son eliminados por su antigua colonia.'}},
+  {id:57, year:2002,cat:'moment',     e:'🔥',title:{en:'South Korea Reaches the Semi-Finals',      pt:'Coreia do Sul Alcança as Semifinais',    es:'Corea del Sur Alcanza las Semifinales'},       hint:{en:'Co-hosts beat Spain, Italy and Portugal to reach the last four.',  pt:'Co-anfitriões vencem Espanha, Itália e Portugal para alcançar as semis.',es:'Los co-anfitriones vencen a España, Italia y Portugal para llegar a semis.'}},
+  {id:58, year:2002,cat:'goal',       e:'⚽',title:{en:"Ronaldo's Redemption Final",                pt:'Final da Redenção de Ronaldo',           es:'La Final de la Redención de Ronaldo'},         hint:{en:'Four years between heartbreak and triumph — Ronaldo scores twice vs Germany.',pt:'Quatro anos entre desolação e triunfo — Ronaldo marca duas vezes vs Alemanha.',es:'Cuatro años entre el dolor y el triunfo — Ronaldo marca dos veces vs Alemania.'}},
+  {id:59, year:2002,cat:'record',     e:'🧤',title:{en:"Kahn's Golden Glove",                       pt:"Luva de Ouro de Kahn",                   es:'El Guante de Oro de Kahn'},                    hint:{en:'The only goalkeeper ever to win the World Cup player of tournament award.',pt:'O único goleiro a vencer o prêmio de melhor jogador de um torneio da Copa.',es:'El único portero que ganó el premio al mejor jugador de un Mundial.'}},
+  {id:60, year:2002,cat:'moment',     e:'💈',title:{en:"Ronaldo's Famous Haircut",                  pt:'O Famoso Corte de Ronaldo',              es:'El Famoso Corte de Pelo de Ronaldo'},          hint:{en:"The bizarre triangular haircut becomes the tournament's most enduring image.",pt:'O estranho corte triangular torna-se a imagem mais duradoura do torneio.',es:'El extravagante corte triangular se convierte en la imagen más duradera del torneo.'}},
+  {id:61, year:2006,cat:'champion',   e:'🇮🇹',title:{en:"Italy's Fourth World Cup",                pt:'Quarto Mundial da Itália',               es:'El Cuarto Mundial de Italia'},                 hint:{en:"The Azzurri win on penalties in Berlin. Cannavaro lifts the cup.",  pt:'Os Azzurri vencem nos pênaltis em Berlim. Cannavaro levanta a taça.',es:'Los Azzurri ganan en penaltis en Berlín. Cannavaro levanta la copa.'}},
+  {id:62, year:2006,cat:'controversy',e:'💥',title:{en:"Zidane's Headbutt",                         pt:'Cabeçada de Zidane',                     es:'El Cabezazo de Zidane'},                       hint:{en:"Zinedine Zidane head-butts Materazzi in extra time of the final.",   pt:'Zinedine Zidane dá cabeçada em Materazzi na prorrogação da final.', es:'Zinedine Zidane da un cabezazo a Materazzi en la prórroga de la final.'}},
+  {id:63, year:2006,cat:'record',     e:'🎯',title:{en:'Miroslav Klose — Golden Boot',              pt:'Miroslav Klose — Chuteira de Ouro',      es:'Miroslav Klose — Bota de Oro'},               hint:{en:'Klose builds towards becoming the all-time World Cup top scorer.',  pt:'Klose constrói o caminho para ser o maior artilheiro da Copa.',   es:'Klose avanza hacia convertirse en el máximo goleador histórico del Mundial.'}},
+  {id:64, year:2006,cat:'controversy',e:'😉',title:{en:'Ronaldo Winks at the Camera',               pt:'Ronaldo Pisca para a Câmera',            es:'Ronaldo Guiña el Ojo a la Cámara'},            hint:{en:"Ronaldo winks after Rooney's red card — causes uproar in England.",  pt:'Ronaldo pisca após o cartão vermelho de Rooney — causa tumulto na Inglaterra.',es:'Ronaldo guiña el ojo tras la tarjeta roja de Rooney — provoca revuelo en Inglaterra.'}},
+  {id:65, year:2010,cat:'champion',   e:'🇪🇸',title:{en:"Spain Wins Its First World Cup",           pt:'Espanha Vence Seu Primeiro Mundial',     es:'España Gana su Primer Mundial'},               hint:{en:"Iniesta's extra-time goal seals tiki-taka's crowning moment.",      pt:"Gol de Iniesta na prorrogação sela o momento máximo do tiki-taka.", es:"El gol de Iniesta en prórroga sella el momento cumbre del tiqui-taca."}},
+  {id:66, year:2010,cat:'goal',       e:'⚽',title:{en:"Iniesta's Golden Goal",                     pt:'Gol de Ouro de Iniesta',                 es:'El Gol de Oro de Iniesta'},                    hint:{en:'Scored in the 116th minute. Dedicated to a teammate lost too young.',pt:'Marcado no minuto 116. Dedicado a um companheiro perdido cedo demais.',es:'Marcado en el minuto 116. Dedicado a un compañero fallecido demasiado joven.'}},
+  {id:67, year:2010,cat:'moment',     e:'📯',title:{en:'Vuvuzelas Fill the Stadiums',               pt:'Vuvuzelas Enchem os Estádios',           es:'Las Vuvuzelas Llenan los Estadios'},           hint:{en:'The distinctive South African horn divides opinion worldwide.',     pt:'A corneta sul-africana característica divide opiniões em todo o mundo.',es:'El característico instrumento sudafricano divide la opinión mundial.'}},
+  {id:68, year:2010,cat:'moment',     e:'🐙',title:{en:'Paul the Octopus Predicts All',             pt:'Paul, o Polvo, Prevê Tudo',              es:'Paul el Pulpo lo Predice Todo'},               hint:{en:'A German aquarium octopus correctly predicts every German result.', pt:'Um polvo de aquário alemão prevê corretamente todos os resultados da Alemanha.',es:'Un pulpo de un acuario alemán predice correctamente todos los resultados alemanes.'}},
+  {id:69, year:2010,cat:'controversy',e:'💔',title:{en:"Asamoah Gyan's Crossbar",                   pt:'Trave de Asamoah Gyan',                  es:'El Palo de Asamoah Gyan'},                     hint:{en:"Ghana's Gyan hits the bar — ending Africa's World Cup dream.",      pt:"Gyan de Gana acerta a trave — encerrando o sonho africano.",      es:'Gyan de Ghana golpea el poste — el sueño africano termina.'}},
+  {id:70, year:2010,cat:'moment',     e:'🌟',title:{en:'Ghana vs USA — Extra-Time Drama',           pt:'Gana vs EUA — Drama na Prorrogação',     es:'Ghana vs EE.UU. — Drama en Prórroga'},        hint:{en:'Asamoah Gyan scores in extra time to send Ghana to the quarters.',  pt:'Asamoah Gyan marca na prorrogação para enviar Gana às quartas.',  es:'Asamoah Gyan marca en prórroga para llevar a Ghana a cuartos.'}},
+  {id:71, year:2014,cat:'champion',   e:'🏆',title:{en:"Germany's Fourth World Cup",                pt:'Quarto Mundial da Alemanha',             es:'El Cuarto Mundial de Alemania'},               hint:{en:"Götze's extra-time goal in the Maracanã seals it vs Argentina.",   pt:'Gol de Götze na prorrogação no Maracanã sela a vitória vs Argentina.',es:"El gol de Götze en prórroga en el Maracaná lo sella frente a Argentina."}},
+  {id:72, year:2014,cat:'moment',     e:'😭',title:{en:'7×1 — Germany Destroys Brazil',             pt:'7×1 — Alemanha Destrói o Brasil',        es:'7×1 — Alemania Destroza a Brasil'},            hint:{en:"Germany score five goals in 18 minutes. Brazil's 'Mineirazo'.",    pt:"Alemanha marca cinco gols em 18 minutos. O 'Mineirazo' do Brasil.",es:"Alemania marca cinco goles en 18 minutos. El 'Mineirazo' de Brasil."}},
+  {id:73, year:2014,cat:'record',     e:'📊',title:{en:"4 Goals in 6 Minutes vs Brazil",            pt:'4 Gols em 6 Minutos vs Brasil',          es:'4 Goles en 6 Minutos vs Brasil'},              hint:{en:'Toni Kroos scores twice in 69 seconds in the semi-final.',         pt:'Toni Kroos marca duas vezes em 69 segundos na semifinal.',         es:'Toni Kroos marca dos veces en 69 segundos en la semifinal.'}},
+  {id:74, year:2014,cat:'goal',       e:'⚽',title:{en:"James Rodríguez's Goal of Tournament",      pt:'Gol do Torneio de James Rodríguez',      es:'El Gol del Torneo de James Rodríguez'},        hint:{en:"Colombia's James scores a chest-and-volley winner of the Puskás Award.",pt:'O colombiano James marca um peito-e-voleio vencedor do Puskás.',  es:'El colombiano James marca un pecho-volea ganador del Premio Puskás.'}},
+  {id:75, year:2014,cat:'controversy',e:'🚑',title:{en:'Neymar Stretchered Off',                    pt:'Neymar Sai de Maca',                     es:'Neymar Sale en Camilla'},                      hint:{en:"Brazil's captain fractures a vertebra against Colombia.",           pt:'O capitão brasileiro fratura uma vértebra contra a Colômbia.',    es:'El capitán brasileño se fractura una vértebra contra Colombia.'}},
+  {id:76, year:2014,cat:'record',     e:'🏅',title:{en:"Messi's Controversial Golden Ball",         pt:'Bola de Ouro Controversa de Messi',      es:'El Polémico Balón de Oro de Messi'},          hint:{en:"Messi wins the Golden Ball despite Argentina losing the final.",    pt:'Messi vence a Bola de Ouro apesar da Argentina perder a final.',  es:'Messi gana el Balón de Oro pese a que Argentina pierde la final.'}},
+  {id:77, year:2014,cat:'record',     e:'🧤',title:{en:"Tim Howard's 16 Saves vs Belgium",          pt:'16 Defesas de Tim Howard vs Bélgica',    es:'Las 16 Paradas de Tim Howard vs Bélgica'},    hint:{en:'US keeper makes 16 saves vs Belgium — the most in a single World Cup match.',pt:'Goleiro americano faz 16 defesas vs Bélgica — o mais num único jogo da Copa.',es:'El portero de EE.UU. realiza 16 paradas vs Bélgica — el máximo en un partido.'}},
+  {id:78, year:2018,cat:'champion',   e:'🇫🇷',title:{en:"France: Two-Time World Champions",          pt:'França: Bicampeã Mundial',               es:'Francia: Bicampeona del Mundo'},               hint:{en:"Mbappé becomes the second teenager to score in a World Cup final.", pt:'Mbappé torna-se o segundo adolescente a marcar numa final de Copa.',es:'Mbappé se convierte en el segundo adolescente en marcar en una final del Mundial.'}},
+  {id:79, year:2018,cat:'goal',       e:'⚽',title:{en:"Mbappé Scores Twice in the Final",          pt:'Mbappé Marca Duas Vezes na Final',       es:'Mbappé Marca Dos Veces en la Final'},          hint:{en:'A teenage superstar announces himself on football\'s biggest stage.',pt:'Uma superestrela adolescente se apresenta no maior palco do futebol.',es:'Una superestrella adolescente se presenta en el mayor escenario del fútbol.'}},
+  {id:80, year:2018,cat:'moment',     e:'📺',title:{en:'VAR Debuts at a World Cup',                 pt:'VAR Estreia em uma Copa',                es:'El VAR Debuta en un Mundial'},                 hint:{en:'Video review technology makes its World Cup debut and changes football.',pt:'A tecnologia de revisão de vídeo estreia na Copa e muda o futebol.',es:'La tecnología de revisión de vídeo debuta en el Mundial y cambia el fútbol.'}},
+  {id:81, year:2018,cat:'moment',     e:'🦅',title:{en:'Croatia Reaches the Final',                 pt:'Croácia Alcança a Final',                es:'Croacia Alcanza la Final'},                    hint:{en:'Luka Modrić leads his small nation all the way to the World Cup final.',pt:'Luka Modrić leva a sua pequena nação até a final da Copa do Mundo.',es:'Luka Modrić lleva a su pequeña nación hasta la final del Mundial.'}},
+  {id:82, year:2018,cat:'record',     e:'🏅',title:{en:'Modrić Wins the Golden Ball',               pt:'Modrić Vence a Bola de Ouro',            es:'Modrić Gana el Balón de Oro'},                hint:{en:'First Golden Ball not won by Messi or Ronaldo in over a decade.',  pt:'Primeiro Bola de Ouro não ganho por Messi ou Ronaldo em mais de uma década.',es:'Primer Balón de Oro no ganado por Messi o Ronaldo en más de una década.'}},
+  {id:83, year:2018,cat:'controversy',e:'😬',title:{en:"Messi Exits in Round of 16",                pt:'Messi Eliminado nas Oitavas',            es:'Messi Eliminado en Octavos'},                  hint:{en:'Argentina crash out to France in a breathless 4-3 thriller.',      pt:'Argentina cai para a França num eletrizante 4-3.',                es:'Argentina cae ante Francia en un apasionante 4-3.'}},
+  {id:84, year:2018,cat:'moment',     e:'🦁',title:{en:"England Reach the Semi-Finals",              pt:'Inglaterra Alcança as Semifinais',       es:'Inglaterra Alcanza las Semifinales'},          hint:{en:"England's first World Cup semi-final since 1990.",                 pt:"Primeira semifinal da Inglaterra desde 1990.",                    es:"La primera semifinal de Inglaterra desde 1990."}},
+  {id:85, year:2018,cat:'controversy',e:'🎭',title:{en:"Neymar's Diving Controversy",               pt:'Controvérsia das Quedas de Neymar',      es:'La Polémica de las Caídas de Neymar'},         hint:{en:'Neymar spends 14 minutes on the ground during the tournament.',    pt:'Neymar fica 14 minutos no chão durante o torneio.',               es:'Neymar pasa 14 minutos en el suelo durante el torneo.'}},
+  {id:86, year:2018,cat:'moment',     e:'🔄',title:{en:'Belgium vs Japan — Epic Comeback',          pt:'Bélgica vs Japão — Virada Épica',        es:'Bélgica vs Japón — La Épica Remontada'},       hint:{en:'Belgium overturn a 2-0 deficit to win 3-2 in the 94th minute.',   pt:'Bélgica reverte 0-2 para vencer 3-2 no minuto 94.',               es:'Bélgica remonta un 0-2 para ganar 3-2 en el minuto 94.'}},
+  {id:87, year:2022,cat:'champion',   e:'🏆',title:{en:'Argentina Tricampeão',                      pt:'Argentina Tricampeã',                    es:'Argentina Tricampeón'},                        hint:{en:'Messi finally lifts the trophy after one of the greatest finals.',  pt:'Messi finalmente levanta a taça após uma das maiores finais da história.',es:'Messi por fin levanta el trofeo tras una de las mejores finales de la historia.'}},
+  {id:88, year:2022,cat:'record',     e:'🐐',title:{en:"Messi's Long-Awaited World Cup",            pt:'Copa do Mundo Esperada de Messi',        es:'El Esperado Mundial de Messi'},                hint:{en:"After 5 failed attempts, Messi claims the last trophy to elude him.", pt:'Após 5 tentativas, Messi reivindica o último troféu que lhe escapava.',es:'Tras 5 intentos fallidos, Messi consigue el último trofeo que se le resistía.'}},
+  {id:89, year:2022,cat:'goal',       e:'⚽',title:{en:"Mbappé's Hat-Trick in the Final",           pt:'Hat-Trick de Mbappé na Final',           es:'El Hat-Trick de Mbappé en la Final'},          hint:{en:'Mbappé scores three in the final yet France still lose in extra time.',pt:'Mbappé marca três na final mas a França ainda perde na prorrogação.',es:'Mbappé marca tres en la final pero Francia aún pierde en la prórroga.'}},
+  {id:90, year:2022,cat:'moment',     e:'🌍',title:{en:'Morocco Reaches the Semi-Finals',           pt:'Marrocos Alcança as Semifinais',         es:'Marruecos Alcanza las Semifinales'},           hint:{en:'The first African nation to reach the World Cup semi-finals.',     pt:'A primeira nação africana a alcançar as semifinais de uma Copa.',  es:'La primera nación africana en alcanzar las semifinales de un Mundial.'}},
+  {id:91, year:2022,cat:'controversy',e:'🔥',title:{en:'Saudi Arabia Shocks Argentina',             pt:'Arábia Saudita Choca a Argentina',       es:'Arabia Saudita Sorprende a Argentina'},        hint:{en:'Argentina lose after 36 unbeaten — the biggest modern upset.',      pt:'Argentina perde após 36 jogos invicta — a maior surpresa moderna.', es:'Argentina pierde tras 36 sin derrota — la mayor sorpresa moderna.'}},
+  {id:92, year:2022,cat:'controversy',e:'😱',title:{en:'Germany Eliminated in Groups Again',        pt:'Alemanha Eliminada nos Grupos Novamente', es:'Alemania Eliminada en Grupos Nuevamente'},     hint:{en:'Defending champions exit the group stage for the second consecutive World Cup.',pt:'Campeões defensores saem na fase de grupos pela segunda Copa consecutiva.',es:'Los campeones defensores caen en grupos por segundo Mundial consecutivo.'}},
+  {id:93, year:2022,cat:'moment',     e:'🇯🇵',title:{en:'Japan Beats Germany and Spain',            pt:'Japão Vence Alemanha e Espanha',         es:'Japón Vence a Alemania y España'},             hint:{en:'Japan beat both Germany and Spain in the groups, shocking football.', pt:'Japão vence Alemanha e Espanha nos grupos, chocando o futebol.',  es:'Japón vence a Alemania y España en grupos, asombrando al mundo del fútbol.'}},
+  {id:94, year:2022,cat:'controversy',e:'✊',title:{en:'Iran Players Protest National Anthem',      pt:'Jogadores do Irã Protestam no Hino',     es:'Los Jugadores de Irán Protestan el Himno'},   hint:{en:'Players refuse to sing in solidarity with protests at home.',      pt:'Jogadores se recusam a cantar em solidariedade aos protestos.',   es:'Los jugadores se niegan a cantar en solidaridad con las protestas.'}},
+  {id:95, year:1930,cat:'record',     e:'🥇',title:{en:'First World Cup Goal Ever',                 pt:'Primeiro Gol da Copa do Mundo',          es:'El Primer Gol de la Historia del Mundial'},    hint:{en:"Lucien Laurent of France scores the very first World Cup goal.",    pt:'Lucien Laurent da França marca o primeiro gol da Copa do Mundo.',  es:'Lucien Laurent de Francia marca el primer gol en la historia del Mundial.'}},
+  {id:96, year:1954,cat:'record',     e:'📊',title:{en:"Hungary's 27 Goals in 5 Games",            pt:"27 Gols da Hungria em 5 Jogos",          es:'Los 27 Goles de Hungría en 5 Partidos'},       hint:{en:"Hungary score 27 goals in 5 games — a standing World Cup record.",  pt:'Hungria marca 27 gols em 5 jogos — recorde que ainda existe.',    es:'Hungría marca 27 goles en 5 partidos — un récord que sigue en pie.'}},
+  {id:97, year:1970,cat:'record',     e:'👑',title:{en:"Pelé's Third and Final World Cup Title",    pt:'Terceiro e Último Título de Copa de Pelé',es:'El Tercer y Último Título de Copa de Pelé'},  hint:{en:'The King bows out of the World Cup as a three-time champion.',     pt:'O Rei se despede da Copa do Mundo como tricampeão.',              es:'El Rey se despide del Mundial como tricampeón.'}},
+  {id:98, year:2014,cat:'controversy',e:'🇳🇱',title:{en:"Robben's Controversial Penalty",          pt:"Pênalti Controverso de Robben",          es:'El Polémico Penalti de Robben'},               hint:{en:'Robben wins a controversial penalty to eliminate Mexico in stoppage time.',pt:'Robben ganha um pênalti controverso para eliminar o México.',    es:'Robben consigue un penalti polémico para eliminar a México en el tiempo añadido.'}},
+  {id:99, year:2022,cat:'moment',     e:'🌍',title:{en:"Cameroon Beat Brazil in Groups",           pt:'Camarões Vence o Brasil nos Grupos',     es:'Camerún Vence a Brasil en Grupos'},            hint:{en:'Cameroon win a historic match but still exit. A celebrated pyrrhic victory.',pt:'Camarões vence mas ainda é eliminado. Uma vitória pírrica celebrada.',es:'Camerún gana un partido histórico pero sigue eliminado. Una victoria pírrica celebrada.'}},
+  {id:100,year:1990,cat:'moment',     e:'💃',title:{en:"Roger Milla's Corner Flag Dance",          pt:'Dança na Bandeirinha de Roger Milla',    es:'El Baile de Roger Milla en el Banderín'},      hint:{en:'The 38-year-old Cameroon striker scores twice and dances around the corner flag.',pt:'O atacante camaronês de 38 anos marca e dança ao redor da bandeirinha.',es:'El delantero camerunés de 38 años marca y baila alrededor del banderín.'}},
+  {id:101,year:1994,cat:'moment',     e:'🦋',title:{en:"Roberto Baggio Carries Italy",             pt:'Roberto Baggio Carrega a Itália',        es:'Roberto Baggio Carga a Italia'},               hint:{en:'The Divine Ponytail leads Italy to the final with 5 crucial goals.', pt:'O Divino Rabo de Cavalo leva a Itália à final com 5 gols cruciais.',es:'La Divina Coleta lleva a Italia a la final con 5 goles cruciales.'}},
+  {id:102,year:2006,cat:'moment',     e:'🎉',title:{en:"Germany's Summer Fairy Tale",               pt:'O Conto de Fadas do Verão Alemão',       es:'El Cuento de Hadas del Verano Alemán'},        hint:{en:'Host Germany reach the semi-finals, turning the tournament into a national party.',pt:'A Alemanha anfitriã alcança as semifinais, transformando o torneio numa festa.',es:'El anfitrión Alemania alcanza semis, convirtiendo el torneo en una fiesta nacional.'}},
+  {id:103,year:2018,cat:'moment',     e:'🇧🇪',title:{en:"Belgium's 'Golden Generation' Disappoints",pt:"'Geração de Ouro' da Bélgica Decepciona",es:"La 'Generación Dorada' de Bélgica Decepciona"},hint:{en:"Belgium lose in the semi-finals for the third major tournament running.",pt:'A Bélgica perde nas semifinais pelo terceiro torneio principal consecutivo.',es:'Bélgica pierde en semifinales por tercer gran torneo consecutivo.'}},
+];
+
+/* ══════════════════════════════════════════════════
+   LOCAL STORAGE
+══════════════════════════════════════════════════ */
+function saveScore(sc,cards,combo){
+  let arr=[];
+  try{
+    arr=JSON.parse(localStorage.getItem('wct-scores')||'[]');
+    arr=arr.map(x=>({s:typeof x.s==='number'?x.s:(typeof x.score==='number'?x.score:0),cards:x.cards||0,combo:x.combo||1})).filter(x=>x.s>=0);
+  }catch(e){arr=[];}
+  arr.push({s:Number(sc)||0,cards:Number(cards)||0,combo:Number(combo)||1});
+  arr.sort((a,b)=>b.s-a.s); arr=arr.slice(0,10);
+  try{localStorage.setItem('wct-scores',JSON.stringify(arr));}catch(e){}
+  return arr;
+}
+
+/* ══════════════════════════════════════════════════
+   CONSTANTS & STATE
+══════════════════════════════════════════════════ */
+const CW=128,DZN=12,DZO=66;
+let timeline=[],queue=[],currentCard=null;
+let score=0,combo=1,maxCombo=1,placed=0,attempts=0,lives=3;
+let gameActive=false,isDragging=false,activeDZ=null;
+let lastCX=0,lastCY=0,rafAS=null;
+
+/* ══════════════════════════════════════════════════
+   CARD HTML
+══════════════════════════════════════════════════ */
+function mkCard(ev,showYear){
+  const col=CCAT[ev.cat]||'#7A4228';
+  const tit=ev.title[lang]||ev.title.en;
+  const hin=ev.hint[lang]||ev.hint.en;
+  const imgUrl=IMGS[ev.id];
+  const imgTag=imgUrl?`<img src="${imgUrl}" loading="lazy" alt="" onerror="this.style.display='none'" style="display:block">`:'';
+  const emojiStyle=imgUrl?'opacity:0;':'';
+  return `<div class="card cat-${ev.cat}" style="--cc:${col}" data-eid="${ev.id}">
+    <div class="card-photo">${imgTag}<span class="card-emoji" style="${emojiStyle}">${ev.e}</span></div>
+    <div class="card-stripe"></div>
+    <div class="card-body">
+      <div class="card-cat">${ev.cat.toUpperCase()}</div>
+      <div class="card-ttl">${tit}</div>
+      <div class="card-dsc">${hin}</div>
+      <div class="card-yr ${showYear?'shown':'masked'}">${ev.year}</div>
+    </div>
+    <div class="card-tip">
+      <div class="ct-cat" style="--cc:${col}">${ev.cat.toUpperCase()}</div>
+      <div class="ct-ttl">${tit}</div>
+      <div class="ct-dsc">${hin}</div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   CENTERING & SCROLL
+══════════════════════════════════════════════════ */
+function applyPadding(){
+  const s=document.getElementById('tl-scroll');
+  const pad=Math.max(60,Math.floor(s.clientWidth/2-CW/2));
+  s.style.paddingLeft=pad+'px'; s.style.paddingRight=pad+'px';
+}
+function scrollToCard(idx,smooth=true){
+  const s=document.getElementById('tl-scroll');
+  const pad=parseInt(s.style.paddingLeft)||60;
+  const target=pad+(DZN+idx*(CW+DZN))+CW/2-s.clientWidth/2;
+  s.scrollTo({left:Math.max(0,target),behavior:smooth?'smooth':'instant'});
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER TIMELINE
+══════════════════════════════════════════════════ */
+function renderTimeline(dragging=false){
+  const track=document.getElementById('tl-track');
+  track.innerHTML='';
+  track.appendChild(mkDZ(0,dragging));
+  timeline.forEach((ev,i)=>{
+    const tmp=document.createElement('div'); tmp.innerHTML=mkCard(ev,true);
+    const card=tmp.firstElementChild; card.classList.add('card-in');
+    track.appendChild(card); track.appendChild(mkDZ(i+1,dragging));
+  });
+}
+function mkDZ(idx,open){
+  const dz=document.createElement('div');
+  dz.className='dz'+(open?' open':''); dz.dataset.index=idx;
+  if(open) dz.innerHTML='<span class="dz-lbl">◆</span>';
+  dz.addEventListener('mouseenter',()=>{ if(isDragging) setDZ(dz); });
+  return dz;
+}
+
+/* ══════════════════════════════════════════════════
+   INIT GAME
+══════════════════════════════════════════════════ */
+function initGame(){
+  score=0;combo=1;maxCombo=1;placed=0;attempts=0;lives=3;
+  gameActive=true; renderLives(); updateHUD();
+  const shuffled=[...EVENTS].sort(()=>Math.random()-.5);
+  timeline=[shuffled[0]]; queue=shuffled.slice(1);
+  renderTimeline(false); applyPadding();
+  setTimeout(()=>scrollToCard(0,false),30);
+  nextCard();
+}
+
+/* ══════════════════════════════════════════════════
+   NEXT CARD
+══════════════════════════════════════════════════ */
+function nextCard(){
+  if(!gameActive) return;
+  if(!queue.length){ endGame(true); return; }
+  currentCard=queue.shift();
+  refreshStageCard();
+  document.getElementById('pfill').style.width=`${Math.min((placed/(EVENTS.length-1))*100,100)}%`;
+  document.getElementById('prog-txt').textContent=tr('eventOf',timeline.length,EVENTS.length);
+}
+function refreshStageCard(){
+  if(!currentCard) return;
+  const wrap=document.getElementById('stage-wrap');
+  const old=wrap.querySelector('.card'); if(old) old.remove();
+  const tmp=document.createElement('div'); tmp.innerHTML=mkCard(currentCard,false);
+  const card=tmp.firstElementChild; wrap.appendChild(card);
+  setupDrag(card);
+  wrap.style.transition='none'; wrap.style.opacity='0'; wrap.style.transform='translateY(14px) scale(.93)';
+  requestAnimationFrame(()=>{
+    wrap.style.transition='opacity .32s ease,transform .32s cubic-bezier(.34,1.56,.64,1)';
+    wrap.style.opacity='1'; wrap.style.transform='';
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   DRAG SYSTEM
+══════════════════════════════════════════════════ */
+function setupDrag(cardEl){
+  const ghost=document.getElementById('ghost'), wrap=document.getElementById('stage-wrap');
+  const onStart=(cx,cy)=>{
+    if(!gameActive||!currentCard) return;
+    isDragging=true; lastCX=cx; lastCY=cy;
+    ghost.innerHTML=mkCard(currentCard,false); ghost.style.display='block'; moveGhost(cx,cy);
+    wrap.style.opacity='.25'; wrap.style.transform='scale(.96)';
+    renderTimeline(true); applyPadding(); startAutoScroll();
+  };
+  const onMove=(cx,cy)=>{ if(!isDragging) return; lastCX=cx; lastCY=cy; moveGhost(cx,cy); hitTestDZ(cx,cy); };
+  const onEnd=(cx,cy)=>{
+    if(!isDragging) return; isDragging=false; stopAutoScroll();
+    ghost.style.display='none'; wrap.style.opacity='1'; wrap.style.transform='';
+    if(activeDZ){ placeCard(parseInt(activeDZ.dataset.index)); }
+    else{
+      const dzs=document.querySelectorAll('.dz'); let best=null,bd=90;
+      dzs.forEach(dz=>{ const r=dz.getBoundingClientRect(); const d=Math.hypot(cx-(r.left+r.right)/2,cy-(r.top+r.bottom)/2); if(d<bd){bd=d;best=dz;} });
+      if(best) placeCard(parseInt(best.dataset.index)); else{ renderTimeline(false); applyPadding(); }
+    }
+    setDZ(null);
+  };
+  // Mouse
+  cardEl.addEventListener('mousedown',e=>{ if(e.button!==0) return; e.preventDefault(); onStart(e.clientX,e.clientY);
+    const mm=e=>onMove(e.clientX,e.clientY); const mu=e=>{ onEnd(e.clientX,e.clientY); window.removeEventListener('mousemove',mm); window.removeEventListener('mouseup',mu); };
+    window.addEventListener('mousemove',mm); window.addEventListener('mouseup',mu); });
+  // Touch — card has touch-action:none so we get all events
+  cardEl.addEventListener('touchstart',e=>{ if(e.touches.length>1) return; const t=e.touches[0]; onStart(t.clientX,t.clientY);
+    const tm=e=>{ if(e.touches.length>1) return; e.preventDefault(); const t=e.touches[0]; onMove(t.clientX,t.clientY); };
+    const te=e=>{ const t=e.changedTouches[0]; onEnd(t.clientX,t.clientY); window.removeEventListener('touchmove',tm); window.removeEventListener('touchend',te); };
+    window.addEventListener('touchmove',tm,{passive:false}); window.addEventListener('touchend',te); },{passive:true});
+}
+function moveGhost(cx,cy){ const g=document.getElementById('ghost'); g.style.left=(cx-66)+'px'; g.style.top=(cy-92)+'px'; }
+function hitTestDZ(cx,cy){ let found=null; document.querySelectorAll('.dz').forEach(dz=>{ const r=dz.getBoundingClientRect(); if(cx>=r.left-10&&cx<=r.right+10&&cy>=r.top-18&&cy<=r.bottom+18) found=dz; }); setDZ(found); }
+function setDZ(dz){ if(activeDZ===dz) return; if(activeDZ) activeDZ.classList.remove('hot'); activeDZ=dz; if(activeDZ) activeDZ.classList.add('hot'); }
+function startAutoScroll(){ stopAutoScroll(); const s=document.getElementById('tl-scroll'); function f(){ if(!isDragging) return; const r=s.getBoundingClientRect(),E=90,SP=10,cx=lastCX; if(cx<r.left+E) s.scrollLeft-=SP*((E-(cx-r.left))/E); else if(cx>r.right-E) s.scrollLeft+=SP*((E-(r.right-cx))/E); hitTestDZ(lastCX,lastCY); rafAS=requestAnimationFrame(f); } rafAS=requestAnimationFrame(f); }
+function stopAutoScroll(){ if(rafAS){ cancelAnimationFrame(rafAS); rafAS=null; } }
+
+// Desktop pan
+(()=>{ const s=document.getElementById('tl-scroll'); let pan=false,panX=0,panL=0;
+  s.addEventListener('mousedown',e=>{ if(isDragging||e.target.closest('#stage-wrap')) return; pan=true; panX=e.clientX; panL=s.scrollLeft; s.classList.add('panning'); e.preventDefault(); });
+  window.addEventListener('mousemove',e=>{ if(!pan) return; s.scrollLeft=panL-(e.clientX-panX); });
+  window.addEventListener('mouseup',()=>{ if(!pan) return; pan=false; s.classList.remove('panning'); }); })();
+
+/* ══════════════════════════════════════════════════
+   MOBILE BUTTONS
+══════════════════════════════════════════════════ */
+document.getElementById('btn-bef').onclick=()=>{ if(gameActive&&currentCard) mobileTap('bef'); };
+document.getElementById('btn-aft').onclick=()=>{ if(gameActive&&currentCard) mobileTap('aft'); };
+function mobileTap(dir){ const cards=[...document.querySelectorAll('#tl-track .card')],mid=window.innerWidth/2; let ci=0,bd=Infinity; cards.forEach((c,i)=>{ const r=c.getBoundingClientRect(); const d=Math.abs((r.left+r.right)/2-mid); if(d<bd){bd=d;ci=i;} }); placeCard(dir==='bef'?ci:ci+1); }
+
+/* ══════════════════════════════════════════════════
+   PLACE CARD
+══════════════════════════════════════════════════ */
+function placeCard(idx){
+  if(!currentCard||!gameActive) return;
+  attempts++;
+  const prev=idx>0?timeline[idx-1]:null, next=idx<timeline.length?timeline[idx]:null;
+  const ok=(prev===null||currentCard.year>=prev.year)&&(next===null||currentCard.year<=next.year);
+  if(ok){
+    timeline.splice(idx,0,currentCard); placed++;
+    combo=Math.min(combo+1,10); if(combo>maxCombo) maxCombo=combo;
+    const pts=100*combo+placed*4; score+=pts;
+    updateHUD(); renderTimeline(false); applyPadding();
+    setTimeout(()=>scrollToCard(idx,true),60);
+    showBurst('ok'); doFlash('ok'); showPts(pts); spawnCF(); playTone('ok');
+    setTimeout(nextCard,540);
+  } else {
+    combo=1; lives--;
+    updateHUD(); renderTimeline(false); applyPadding();
+    showBurst('err'); doFlash('err'); playTone('err');
+    const wrap=document.getElementById('stage-wrap');
+    wrap.classList.add('shaking'); setTimeout(()=>wrap.classList.remove('shaking'),500);
+    const stgCard=wrap.querySelector('.card'); if(stgCard){ stgCard.classList.add('red-flash'); setTimeout(()=>stgCard.classList.remove('red-flash'),660); }
+    renderLives(true);
+    if(lives>0){ showToast(lives===1?tr('lastLife'):tr('lifeLost',lives)); setTimeout(nextCard,900); }
+    else{ gameActive=false; const saved=currentCard; setTimeout(()=>endGame(false,saved),1080); }
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   HUD
+══════════════════════════════════════════════════ */
+function updateHUD(){
+  document.getElementById('cv-score').textContent=score.toLocaleString();
+  document.getElementById('cv-combo').textContent='×'+combo;
+  document.getElementById('combo-chip').classList.toggle('hot',combo>1);
+}
+function renderLives(anim=false){
+  for(let i=1;i<=3;i++){
+    const h=document.getElementById('h'+i);
+    if(i>lives){ if(!h.classList.contains('gone')){ h.classList.add('gone'); if(anim){h.classList.remove('nope');void h.offsetWidth;h.classList.add('nope');} } }
+    else{ h.classList.remove('gone'); if(anim){h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop');} }
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   VFX
+══════════════════════════════════════════════════ */
+function showBurst(t){
+  const el=document.getElementById('btext'); el.className=''; void el.offsetWidth;
+  if(t==='ok'){
+    const msgs=tr('correct');
+    el.textContent=combo>=8?tr('comboMsg',combo):combo>=5?tr('comboMsg',combo):combo>=3?msgs[Math.min(2+combo-3,msgs.length-1)]:msgs[Math.floor(Math.random()*2)];
+    el.className=combo>=5?'bcombo':'bok';
+  } else { const msgs=tr('wrong'); el.textContent=msgs[Math.floor(Math.random()*msgs.length)]; el.className='ber'; }
+}
+function doFlash(t){ const el=document.getElementById('flash'); el.className=''; void el.offsetWidth; el.className=t==='ok'?'fok':'ferr'; }
+function showPts(pts){ const el=document.createElement('div'); el.className='ptspop'; el.textContent='+'+pts; el.style.left=(window.innerWidth/2-20+(Math.random()*50-25))+'px'; el.style.top=(window.innerHeight*.45)+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(),1600); }
+function spawnCF(){ const cols=['#D4AF37','#F0D98A','#1B4332','#5A9E78','#8C1515','#F5ECD7','#1E2D4A']; for(let i=0;i<28;i++){ const el=document.createElement('div'); el.className='cf'; const a=Math.random()*Math.PI*2,d=70+Math.random()*140; el.style.left=window.innerWidth/2+'px'; el.style.top=window.innerHeight*.43+'px'; el.style.background=cols[Math.floor(Math.random()*cols.length)]; el.style.setProperty('--mv',`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`); el.style.setProperty('--dur',(0.7+Math.random()*.8)+'s'); el.style.borderRadius=Math.random()>.5?'50%':'1px'; el.style.width=(6+Math.random()*4)+'px'; el.style.height=(6+Math.random()*4)+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(),1700); } }
+function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.className=''; void el.offsetWidth; el.className='show'; }
+
+/* ── SOUND EFFECTS ── */
+let ac=null;
+function getAC(){ if(!ac) ac=new(window.AudioContext||window.webkitAudioContext)(); return ac; }
+function playTone(t){
+  try{
+    const ctx=getAC();
+    if(t==='ok'){ [[440,0],[554,.1],[659,.22]].forEach(([f,d])=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(.1,ctx.currentTime+d); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.38); o.connect(g); g.connect(ctx.destination); o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+.42); }); }
+    else{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(200,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(52,ctx.currentTime+.33); g.gain.setValueAtTime(.08,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.36); o.connect(g); g.connect(ctx.destination); o.start(ctx.currentTime); o.stop(ctx.currentTime+.38); }
+  }catch(e){}
+}
+
+/* ── BACKGROUND MUSIC ── */
+let musicCtx=null,musicMaster=null,musicPlaying=false,musicReverb=null;
+function initMusic(){
+  if(musicCtx) return;
+  try{
+    musicCtx=new(window.AudioContext||window.webkitAudioContext)();
+    musicMaster=musicCtx.createGain(); musicMaster.gain.value=0; musicMaster.connect(musicCtx.destination);
+    // Build reverb
+    const conv=musicCtx.createConvolver();
+    const len=musicCtx.sampleRate*2.8; const buf=musicCtx.createBuffer(2,len,musicCtx.sampleRate);
+    for(let c=0;c<2;c++){ const d=buf.getChannelData(c); for(let j=0;j<len;j++) d[j]=(Math.random()*2-1)*Math.pow(1-j/len,1.5); }
+    conv.buffer=buf; musicReverb=conv; musicReverb.connect(musicMaster);
+    musicMaster.gain.linearRampToValueAtTime(.04,musicCtx.currentTime+5);
+    musicPlaying=true;
+    scheduleLoop(musicCtx.currentTime+.3);
+    document.getElementById('sound-btn').textContent='🔊';
+  }catch(e){}
+}
+function scheduleLoop(t){
+  if(!musicCtx||!musicPlaying) return;
+  const ctx=musicCtx; const B=.88; const LOOP=16*B;
+  function n(freq,start,dur,vol=.25,type='sine'){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type; o.frequency.value=freq;
+    const att=Math.min(.2,dur*.2); const rel=Math.min(.4,dur*.35);
+    g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(vol,start+att);
+    g.gain.setValueAtTime(vol,start+dur-rel); g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g); g.connect(musicMaster); if(musicReverb) g.connect(musicReverb);
+    o.start(start); o.stop(start+dur+.05);
+  }
+  // F pentatonic — bass drone, pad, gentle melody
+  n(87.3,t,4*B,.36); n(87.3,t+4*B,2*B,.3); n(130.8,t+6*B,2*B,.25); n(87.3,t+8*B,4*B,.36); n(98,t+12*B,2*B,.28); n(87.3,t+14*B,2*B,.32);
+  [174.6,220,261.6].forEach(f=>n(f,t,LOOP,.1));
+  [[220,0],[261.6,2],[293.7,3.5],[349.2,5],[293.7,7],[261.6,9],[220,11],[196,13],[174.6,15]].forEach(([f,o])=>n(f,t+o*B,1.9*B,.16));
+  const delay=Math.max(100,(t+LOOP-ctx.currentTime-1)*1000);
+  setTimeout(()=>{ if(musicPlaying&&musicCtx) scheduleLoop(ctx.currentTime+.1); },delay);
+}
+function toggleMusic(){
+  if(!musicCtx){ initMusic(); return; }
+  musicPlaying=!musicPlaying;
+  const btn=document.getElementById('sound-btn');
+  if(musicPlaying){ musicMaster.gain.setValueAtTime(musicMaster.gain.value,musicCtx.currentTime); musicMaster.gain.linearRampToValueAtTime(.04,musicCtx.currentTime+.8); scheduleLoop(musicCtx.currentTime+.1); btn.textContent='🔊'; }
+  else{ musicMaster.gain.setValueAtTime(musicMaster.gain.value,musicCtx.currentTime); musicMaster.gain.linearRampToValueAtTime(0,musicCtx.currentTime+1.2); btn.textContent='🔇'; }
+}
+document.getElementById('sound-btn').onclick=toggleMusic;
+
+/* ══════════════════════════════════════════════════
+   GAME OVER
+══════════════════════════════════════════════════ */
+function endGame(won,failedCard){
+  try{
+    const fs=Number(score)||0,fp=Number(placed)||0,fc=Number(maxCombo)||1,fa=Number(attempts)||0;
+    const scores=saveScore(fs,fp,fc);
+    const isBest=scores.length>0&&scores[0].s===fs&&fs>0&&(scores.length===1||fs>(scores[1]?.s||0));
+    document.getElementById('sv-score').textContent=fs.toLocaleString();
+    document.getElementById('sv-placed').textContent=fp;
+    document.getElementById('sv-combo').textContent='×'+fc;
+    document.getElementById('sv-acc').textContent=fa>0?Math.round((fp/fa)*100)+'%':'—';
+    if(won){ document.getElementById('go-sub').textContent=tr('won'); document.getElementById('go-icon').textContent='🏆'; }
+    else{ const subs=tr('subs'); let msg=subs[0][1]; for(const[n,s] of subs){if(fp>=n)msg=s;} document.getElementById('go-sub').textContent=msg; document.getElementById('go-icon').textContent=fp>=10?'🥈':fp>=5?'⚽':'💔'; }
+    document.getElementById('best-badge').classList.toggle('on',isBest);
+    const box=document.getElementById('abox'); const card=failedCard||currentCard;
+    if(!won&&card){ let i=0; while(i<timeline.length&&timeline[i].year<=card.year)i++; const prev=i>0?timeline[i-1]:null,next=i<timeline.length?timeline[i]:null; const tit=card.title[lang]||card.title.en; let h=tr('ansPre',tit,card.year); if(prev&&next) h+=tr('ansBtw',prev.year,prev.title[lang]||prev.title.en,next.year,next.title[lang]||next.title.en); else if(prev) h+=tr('ansAft',prev.year,prev.title[lang]||prev.title.en); else if(next) h+=tr('ansBef',next.year,next.title[lang]||next.title.en); box.innerHTML=h; box.style.display='block'; }
+    else box.style.display='none';
+    const list=document.getElementById('hs-list'); list.innerHTML='';
+    scores.slice(0,5).forEach((s,i)=>{ const row=document.createElement('div'); row.className='hsr'+(i===0&&isBest?' cur':''); row.innerHTML=`<span class="hr">#${i+1}</span><span class="hp">${(Number(s.s)||0).toLocaleString()}</span><span class="hi">${tr('cards',s.cards||0)}</span>`; list.appendChild(row); });
+    document.getElementById('scr-go').classList.add('on');
+  }catch(err){ console.error('endGame:',err); document.getElementById('scr-go').classList.add('on'); }
+}
+
+/* ══════════════════════════════════════════════════
+   SCREENS & BOOT
+══════════════════════════════════════════════════ */
+document.getElementById('btn-start').onclick=()=>{ document.getElementById('scr-start').classList.remove('on'); initGame(); initMusic(); };
+document.getElementById('btn-rp').onclick=()=>{ document.getElementById('scr-go').classList.remove('on'); initGame(); };
+document.addEventListener('keydown',e=>{ if(e.code!=='Enter'&&e.code!=='Space') return; if(document.getElementById('scr-start').classList.contains('on')) document.getElementById('btn-start').click(); if(document.getElementById('scr-go').classList.contains('on')) document.getElementById('btn-rp').click(); });
+window.addEventListener('resize',()=>{ if(gameActive) applyPadding(); });
+
+applyI18n();
+setLang(lang);
+loadImages();
+</script>
+</body>
+</html>
